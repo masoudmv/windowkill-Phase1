@@ -21,7 +21,7 @@ public class Direction {
             else this.state=DirectionState.negative;
         }
         this.magnitude = Math.hypot(point.getX(),point.getY());
-        if (magnitude >SPEED) this.magnitude = SPEED;
+//        if (magnitude >SPEED) this.magnitude = SPEED;
     }
 
     public Direction(double angle) {
@@ -42,6 +42,16 @@ public class Direction {
         if (isDownward) return new Point2D.Double(0,-1);
         double magnitude=Math.sqrt(1+slope*slope);
         Point2D.Double normalVector=new Point2D.Double(1/magnitude,slope/magnitude);
+        if (state==DirectionState.negative) normalVector=new Point2D.Double(-normalVector.x,-normalVector.y);
+        return normalVector;
+    }
+
+    public Point2D getDirectionVector(){
+        if (state==DirectionState.neutral) return new Point(0,0);
+        if (isUpward) return new Point2D.Double(0,magnitude);
+        if (isDownward) return new Point2D.Double(0,-magnitude);
+        double magnit = Math.sqrt(1+slope*slope);
+        Point2D.Double normalVector=new Point2D.Double(magnitude/magnit,magnitude * slope/magnit);
         if (state==DirectionState.negative) normalVector=new Point2D.Double(-normalVector.x,-normalVector.y);
         return normalVector;
     }

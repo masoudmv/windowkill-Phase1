@@ -3,6 +3,7 @@ package model.charactersModel;
 import model.collision.Collidable;
 import model.movement.Direction;
 import model.movement.Movable;
+import view.myFrame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,6 +11,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import static controller.Constants.FRICTION;
 import static controller.Constants.RADIUS;
 import static controller.Controller.createEpsilonView;
 import static controller.Utils.addVectors;
@@ -33,13 +35,15 @@ public class EpsilonModel implements Movable, Collidable {
         Point vector = new Point(0,0);
         this.direction=new Direction(vector);
         epsilonModels.add(this);
-        Collidable.collidables.add(this);
+        collidables.add(this);
+        movables.add(this);
         createEpsilonView(id);
         INSTANCE = this;
     }
 
     public static EpsilonModel getINSTANCE() {
-//        if (INSTANCE == null) INSTANCE = new EpsilonModel(, RADIUS);
+        if (INSTANCE == null) INSTANCE = new EpsilonModel(
+                new Point2D.Double((double) myFrame.getINSTANCE().getWidth() /2,(double) myFrame.getINSTANCE().getHeight() /2));
         return INSTANCE;
     }
 
@@ -82,9 +86,16 @@ public class EpsilonModel implements Movable, Collidable {
     public boolean isCircular() {
         return true;
     }
+    @Override
     public void friction(){
-        direction.setMagnitude(direction.getMagnitude() * 0.9);
-        if (direction.getMagnitude() < 0.2) direction.setMagnitude(0);
+        direction.setMagnitude(direction.getMagnitude() * FRICTION);
+        if (direction.getMagnitude() < 0.2){
+            direction.setMagnitude(0);
+        }
     }
+//    @Override
+//    public void friction() {
+//        move(direction);
+//    }
 
 }

@@ -16,7 +16,9 @@ import java.util.Random;
 
 import static controller.Constants.*;
 
-public final class myPanel extends JPanel  implements Collidable {
+//public final class myPanel extends JPanel  implements Collidable {
+public final class myPanel extends JPanel  {
+
     private static myPanel INSTANCE;
     private final Random rng=new Random();
     private myPanel() {
@@ -27,7 +29,7 @@ public final class myPanel extends JPanel  implements Collidable {
 //        setBackground(Color.BLACK);
         setLocationToCenter(myFrame.getINSTANCE());
         myFrame.getINSTANCE().add(this);
-        Collidable.collidables.add(this);
+//        Collidable.collidables.add(this);
     }
     public void setLocationToCenter(myFrame glassFrame){
         setLocation(glassFrame.getWidth()/2-getWidth()/2,glassFrame.getHeight()/2-getHeight()/2);
@@ -53,19 +55,19 @@ public final class myPanel extends JPanel  implements Collidable {
         return INSTANCE;
     }
 
-    @Override
-    public boolean isCircular() {
-        return false;
-    }
-
-    @Override
-    public Point2D getAnchor() {
-        return null;
-    }
-
-    @Override
-    public ArrayList<Point2D> getVertices() {
-        return new ArrayList<>(List.of(new Point2D.Double(getX(),getY()),new Point2D.Double(getX()+getWidth(),getY()),
-                new Point2D.Double(getX()+getWidth(),getY()+getHeight()),new Point2D.Double(getX(),getY()+getHeight())));
-    }
+//    @Override
+//    public boolean isCircular() {
+//        return false;
+//    }
+//
+//    @Override
+//    public Point2D getAnchor() {
+//        return null;
+//    }
+//
+//    @Override
+//    public ArrayList<Point2D> getVertices() {
+//        return new ArrayList<>(List.of(new Point2D.Double(getX(),getY()),new Point2D.Double(getX()+getWidth(),getY()),
+//                new Point2D.Double(getX()+getWidth(),getY()+getHeight()),new Point2D.Double(getX(),getY()+getHeight())));
+//    }
 }

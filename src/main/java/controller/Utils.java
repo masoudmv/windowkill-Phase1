@@ -31,4 +31,14 @@ public class Utils {
         point.setLocation(x, y);
         return point;
     }
+    public static Point2D PerpendicularClockwise(Point2D vector)
+    {
+        return new Point2D.Double(vector.getY(), -vector.getX());
+    }
+
+    public static Point2D PerpendicularCounterClockwise(Point2D vector)
+    {
+        return new Point2D.Double(-vector.getY(), vector.getX());
+    }
+
 }
