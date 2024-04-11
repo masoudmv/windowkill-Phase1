@@ -3,6 +3,7 @@ package model.movement;
 import java.awt.*;
 import java.awt.geom.Point2D;
 
+import static controller.Constants.EPSILON_MAX_SPEED;
 import static controller.Constants.SPEED;
 
 public class Direction {
@@ -21,7 +22,6 @@ public class Direction {
             else this.state=DirectionState.negative;
         }
         this.magnitude = Math.hypot(point.getX(),point.getY());
-//        if (magnitude >SPEED) this.magnitude = SPEED;
     }
 
     public Direction(double angle) {
@@ -56,11 +56,21 @@ public class Direction {
         return normalVector;
     }
 
+    public void accelerateDirection(double speed){
+//        magnitude *= 1.2;
+        if (magnitude < speed){
+            magnitude *= 1.2;
+        }
+    }
+
 
 
 
     public void adjustDirectionMagnitude(){
         if (magnitude >SPEED) this.magnitude = SPEED;
+    }
+    public void adjustEpsilonDirectionMagnitude(){
+        if (magnitude >EPSILON_MAX_SPEED) this.magnitude = EPSILON_MAX_SPEED;
     }
 
     public double getMagnitude() {

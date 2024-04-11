@@ -22,6 +22,7 @@ public class SquarantineModel implements Movable, Collidable {
     double radius;
     String id;
     Direction direction;
+    private boolean impactInProgress = false;
     private ArrayList<Point2D> vertices = new ArrayList<>();
     public static ArrayList<SquarantineModel> squarantineModels =new ArrayList<>();
 
@@ -45,6 +46,15 @@ public class SquarantineModel implements Movable, Collidable {
 
     public String getId() {
         return id;
+    }
+
+    @Override
+    public boolean isImpactInProgress() {
+        return impactInProgress;
+    }
+    @Override
+    public void setImpactInProgress(boolean impactInProgress) {
+        this.impactInProgress = impactInProgress;
     }
 
     @Override
@@ -82,19 +92,22 @@ public class SquarantineModel implements Movable, Collidable {
     }
 
     @Override
-    public void friction(){
-//        direction.setMagnitude(direction.getMagnitude() * 0.8);
-//        if (direction.getMagnitude() < 0.2){
-//            direction.setMagnitude(0);
-//        }
-    }
-
-    @Override
     public boolean isCircular() {
         return false;
     }
 
     public Point2D getCurrentLocation() {
         return currentLocation;
+    }
+    @Override
+    public void friction(){
+        direction.setMagnitude(direction.getMagnitude() * 0.97);
+        if (direction.getMagnitude() < 1){
+//            direction.setMagnitude(0);
+
+            setDirection(
+                    new Direction(relativeLocation(EpsilonModel.getINSTANCE().getAnchor(), getAnchor())));
+            getDirection().adjustDirectionMagnitude();
+        }
     }
 }

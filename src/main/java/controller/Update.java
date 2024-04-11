@@ -73,14 +73,37 @@ public class Update {
         updateCount++;
 
         for (SquarantineModel squarantineModel: squarantineModels){
-            Point2D direction =  relativeLocation(EpsilonModel.getINSTANCE().getAnchor(), squarantineModel.getAnchor());
-//            normalizeVector(direction);
-            Direction d = new Direction(addVectors(normalizeVector(direction), squarantineModel.getDirection().getDirectionVector()));
-            d.adjustDirectionMagnitude();
-            squarantineModel.setDirection(d);
-//            direction.adjustDirectionMagnitude();
-//            squarantineModel.setDirection(direction);
+//            System.out.println(squarantineModel.getDirection().getMagnitude());
+            if(!squarantineModel.isImpactInProgress()){
+
+            } else {
+                squarantineModel.getDirection().accelerateDirection(2);
+                if (squarantineModel.getDirection().getMagnitude() > 2){
+                    squarantineModel.setImpactInProgress(false);
+                }
+
+            }
+//            else {
+//                Point2D direction =  relativeLocation(EpsilonModel.getINSTANCE().getAnchor(), squarantineModel.getAnchor());
+//                Direction d = new Direction(addVectors(multiplyVector(normalizeVector(direction), 1), squarantineModel.getDirection().getDirectionVector()));
+//                d.adjustDirectionMagnitude();
+//                squarantineModel.setDirection(d);
+
+//            }
+
         }
+        EpsilonModel epsilonModel = EpsilonModel.getINSTANCE();
+//        System.out.println(epsilonModel.getDirection().getMagnitude() +"  "+epsilonModel.isImpactInProgress());
+        if (!epsilonModel.isImpactInProgress()){
+
+        } else {
+            epsilonModel.getDirection().accelerateDirection(6);
+            if (epsilonModel.getDirection().getMagnitude() > 4){
+                epsilonModel.setImpactInProgress(false);
+            }
+        }
+
+
 
         // Current time in milliseconds
         long currentTime = System.currentTimeMillis();
@@ -88,7 +111,7 @@ public class Update {
         // Check if one second has passed
         if (currentTime - lastUpdateTimeUPS >= 1000) {
             // Print the FPS (which is frameCount since it's been a second)
-//            System.out.println("UPS: " + updateCount);
+            System.out.println("UPS: " + updateCount);
 
             // Reset frame counter and last update time for the next second
             updateCount = 0;
@@ -103,7 +126,7 @@ public class Update {
         for (int i=0;i<collidables.size();i++){
             for (int j=i+1;j<collidables.size();j++){
                 CollisionState collisionState = collidables.get(i).collides(collidables.get(j));
-//                if (collisionState != null){
+                if (collisionState != null){
 //                    Movable movable1 = null;
 //                    Movable movable2 = null;
 
@@ -130,7 +153,7 @@ public class Update {
 //                    }
 //                    if (movable1 != null) movable1.move();
 //                    if (movable2 != null) movable2.move();
-//                }
+                }
             }
         }
     }

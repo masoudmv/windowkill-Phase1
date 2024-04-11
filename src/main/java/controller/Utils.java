@@ -12,9 +12,6 @@ public class Utils {
     public static Point2D multiplyVectorXYComponent(Point2D point,double scalarX, double scalarY){
         return new Point2D.Double(point.getX()*scalarX, point.getY() * scalarY);
     }
-//    public static Point2D multiplyVectorYComponent(Point2D point,double scalar){
-//        return new Point2D.Double(point.getX(),point.getY() * scalar);
-//    }
     public static Point2D addVectors(Point2D point1,Point2D point2){
         return new Point2D.Double(point1.getX()+point2.getX(),point1.getY()+point2.getY());
     }

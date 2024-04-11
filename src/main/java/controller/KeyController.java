@@ -83,7 +83,7 @@ public class KeyController implements KeyListener {
         Point2D point = multiplyVector(EpsilonModel.getINSTANCE().getDirection().getNormalizedDirectionVector(),
                 EpsilonModel.getINSTANCE().getDirection().getMagnitude());
         Direction direction = new Direction(addVectors(point, vector));
-        direction.adjustDirectionMagnitude();
+        direction.adjustEpsilonDirectionMagnitude();
         EpsilonModel.getINSTANCE().setDirection(direction);
     }
 }

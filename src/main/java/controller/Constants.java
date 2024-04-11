@@ -10,13 +10,12 @@ public class Constants {
     public static final double FRAME_UPDATE_TIME=(double) TimeUnit.SECONDS.toMillis(1)/FPS;
     public static final int UPS = 100;
     public static final double MODEL_UPDATE_TIME=(double) TimeUnit.SECONDS.toMillis(1)/UPS;
-    public static final double SPEED = 2;
-    public static final double MIN_RADIUS = 5;
+    public static final double EPSILON_MAX_SPEED = 4;
+    public static final double SPEED = 1;
     public static final double RADIUS = 15;
-    public static final int NUMBER_OF_BALLS = 20;
-    public static final int SQUARANTINE_EDGE = 30;
-    public static final double FRICTION = 0.9;
-    public static final double IMPACT_COEFFICIENT = 20;
-    public static final double LARGE_IMPACT_RADIUS = 200;
+    public static final int SQUARANTINE_EDGE = 50;
+    public static final double FRICTION = 0.92;
+    public static final double IMPACT_COEFFICIENT = 5;
+    public static final double LARGE_IMPACT_RADIUS = 50;
     public static final double IMPACT_RADIUS = 300;
 }

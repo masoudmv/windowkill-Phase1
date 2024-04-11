@@ -12,24 +12,16 @@ import model.collision.CollisionState;
 import model.movement.Movable;
 
 public interface Collidable {
-    LinkedList<Collidable> collidables = new LinkedList<>();
+    ArrayList<Collidable> collidables = new ArrayList<>();
     boolean isCircular();
 //    double getRadius();
     Point2D getAnchor();
     ArrayList<Point2D> getVertices();
     default CollisionState collides(Collidable collidable){
-//        if (isCircular() && collidable.isCircular()){
-//            double distance = getAnchor().distance(collidable.getAnchor());
-//            if (distance <= 2*RADIUS){
-//                return new CollisionState(weightedAddVectors(getAnchor(),collidable.getAnchor(),RADIUS ,RADIUS));
-//            }
-//            return null;
-//        }
         if (isCircular() && !collidable.isCircular()){
             Point2D closest = closestPointOnPolygon(getAnchor(), collidable.getVertices());
             if (closest.distance(getAnchor()) <= RADIUS) {
                 for (Movable movable: movables){
-//                    System.out.println(closest);
                     movable.impact(new CollisionState(closest));
                 }
                 return new CollisionState(closest);

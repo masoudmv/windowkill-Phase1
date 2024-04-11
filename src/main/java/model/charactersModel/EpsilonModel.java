@@ -21,7 +21,7 @@ public class EpsilonModel implements Movable, Collidable {
     private static EpsilonModel INSTANCE;
     Point2D anchor;
     double radius;
-
+    private boolean impactInProgress = false;
     String id;
     Direction direction;
     public static ArrayList<EpsilonModel> epsilonModels=new ArrayList<>();
@@ -50,6 +50,17 @@ public class EpsilonModel implements Movable, Collidable {
     public String getId() {
         return id;
     }
+
+    @Override
+    public boolean isImpactInProgress() {
+        return impactInProgress;
+    }
+
+    @Override
+    public void setImpactInProgress(boolean impactInProgress) {
+        this.impactInProgress = impactInProgress;
+    }
+
     @Override
     public void setDirection(Direction direction) {
         this.direction = direction;
@@ -88,14 +99,18 @@ public class EpsilonModel implements Movable, Collidable {
     }
     @Override
     public void friction(){
-        direction.setMagnitude(direction.getMagnitude() * FRICTION);
-        if (direction.getMagnitude() < 0.2){
-            direction.setMagnitude(0);
+        if (isImpactInProgress()){
+//            direction.setMagnitude(direction.getMagnitude() * FRICTION);
+            if (direction.getMagnitude() < 1){
+//                direction.setMagnitude(0);
+                setImpactInProgress(false);
+            }
+        } else {
+            direction.setMagnitude(direction.getMagnitude() * 0.93);
+            if (direction.getMagnitude() < 0.5){
+                direction.setMagnitude(0);
+            }
         }
-    }
-//    @Override
-//    public void friction() {
-//        move(direction);
-//    }
 
+    }
 }
