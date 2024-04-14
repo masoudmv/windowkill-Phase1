@@ -23,40 +23,7 @@ public interface Movable {
     void move();
     void friction();
     Point2D getAnchor();
-    default void impact(CollisionState collisionState){
-        setImpactInProgress(true);
-        Point2D collisionPoint = collisionState.collisionPoint;
-        Point2D collisionRelativeVector = relativeLocation(this.getAnchor(), collisionPoint);
-        double impactCoefficient = getImpactCoefficient(collisionRelativeVector);
-        Point2D impactVector = normalizeVector(relativeLocation(this.getAnchor(), collisionState.collisionPoint));
-        impactVector = multiplyVector(impactVector ,impactCoefficient);
-//        System.out.println(impactVector);
-        Point2D r2 = addVectors(this.getDirection().getNormalizedDirectionVector(), impactVector);
-        if(!isCircular()){
-            Direction direction = new Direction(normalizeVector(r2));
-            this.setDirection(direction);
-        } else {
-//            Direction direction = new Direction(r2);
-//            this.setDirection(direction);
-            Direction direction = new Direction(normalizeVector(r2));
-            this.setDirection(direction);
-        }
-
+    void impact(CollisionState collisionState);
 //        direction.adjustEpsilonDirectionMagnitude();
-
-    }
-    private static double getImpactCoefficient(Point2D collisionRelativeVector) {
-
-        double distance = Math.hypot(collisionRelativeVector.getX(), collisionRelativeVector.getY());
-        double impactCoefficient;
-        if (distance < LARGE_IMPACT_RADIUS) {
-            impactCoefficient = IMPACT_COEFFICIENT;
-        } else if (distance > IMPACT_RADIUS) {
-            impactCoefficient = 0;
-        } else {
-            double coefficient = 1-(distance-LARGE_IMPACT_RADIUS)/(IMPACT_RADIUS-LARGE_IMPACT_RADIUS);
-            impactCoefficient = coefficient * IMPACT_COEFFICIENT;
-        }
-        return impactCoefficient;
-    }
+    double getImpactCoefficient(Point2D collisionRelativeVector);
 }

@@ -2,26 +2,23 @@ package controller;
 
 import model.charactersModel.EpsilonModel;
 import model.charactersModel.SquarantineModel;
-import model.collision.Collidable;
 import model.collision.CollisionState;
-import model.movement.Direction;
 import model.movement.Movable;
 import view.charactersView.SquarantineView;
+import view.charactersView.TrigorathView;
 import view.myFrame;
-import view.myPanel;
+import view.mainPanel;
 import view.charactersView.EpsilonView;
 
 import javax.swing.*;
 
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-
 import static controller.Constants.*;
 import static controller.Controller.*;
-import static controller.Utils.*;
 import static model.charactersModel.SquarantineModel.squarantineModels;
 import static model.collision.Collidable.collidables;
 import static model.movement.Movable.movables;
+import static view.charactersView.SquarantineView.squarantineViews;
+import static view.charactersView.TrigorathView.trigorathViews;
 
 public class Update {
     // Add FPS tracking variables
@@ -59,11 +56,13 @@ public class Update {
         }
 
         for (EpsilonView epsilonView: EpsilonView.epsilonViews){
-            epsilonView.setCurrentLocation(calculateViewLocationEpsilon(myPanel.getINSTANCE(),epsilonView.getId()));
+            epsilonView.setCurrentLocation(calculateViewLocationEpsilon(mainPanel.getINSTANCE(),epsilonView.getId()));
         }
-        for (SquarantineView squarantineView: SquarantineView.squarantineViews){
-            squarantineView.setCurrentLocation(calculateViewLocationSquarantine(myPanel.getINSTANCE(),squarantineView.getId()));
-//            System.out.println(squarantineView.getCurrentLocation());
+        for (SquarantineView squarantineView: squarantineViews){
+            squarantineView.setCurrentLocation(calculateViewLocationSquarantine(mainPanel.getINSTANCE(),squarantineView.getId()));
+        }
+        for (TrigorathView trigorathView : trigorathViews){
+            trigorathView.setCurrentLocation(calculateViewLocationTrigorath(mainPanel.getINSTANCE(),trigorathView.getId()));
         }
         myFrame.getINSTANCE().repaint();
     }
@@ -73,37 +72,20 @@ public class Update {
         updateCount++;
 
         for (SquarantineModel squarantineModel: squarantineModels){
-//            System.out.println(squarantineModel.getDirection().getMagnitude());
-            if(!squarantineModel.isImpactInProgress()){
-
-            } else {
-                squarantineModel.getDirection().accelerateDirection(2);
-                if (squarantineModel.getDirection().getMagnitude() > 2){
+            if (squarantineModel.isImpactInProgress()){
+                squarantineModel.getDirection().accelerateDirection(squarantineModel.impactMaxVelocity);
+                if (squarantineModel.getDirection().getMagnitude() > squarantineModel.impactMaxVelocity){
                     squarantineModel.setImpactInProgress(false);
                 }
-
             }
-//            else {
-//                Point2D direction =  relativeLocation(EpsilonModel.getINSTANCE().getAnchor(), squarantineModel.getAnchor());
-//                Direction d = new Direction(addVectors(multiplyVector(normalizeVector(direction), 1), squarantineModel.getDirection().getDirectionVector()));
-//                d.adjustDirectionMagnitude();
-//                squarantineModel.setDirection(d);
-
-//            }
-
         }
         EpsilonModel epsilonModel = EpsilonModel.getINSTANCE();
-//        System.out.println(epsilonModel.getDirection().getMagnitude() +"  "+epsilonModel.isImpactInProgress());
-        if (!epsilonModel.isImpactInProgress()){
-
-        } else {
+        if (epsilonModel.isImpactInProgress()){
             epsilonModel.getDirection().accelerateDirection(6);
             if (epsilonModel.getDirection().getMagnitude() > 4){
                 epsilonModel.setImpactInProgress(false);
             }
         }
-
-
 
         // Current time in milliseconds
         long currentTime = System.currentTimeMillis();
@@ -120,40 +102,10 @@ public class Update {
         for (Movable movable: movables){
             movable.move();
             movable.friction();
-//            System.out.println(movable.getDirection().getDirectionVector());
         }
-//        ArrayList<Collidable> collidables = new ArrayList<>(Collidable.collidables);
         for (int i=0;i<collidables.size();i++){
             for (int j=i+1;j<collidables.size();j++){
-                CollisionState collisionState = collidables.get(i).collides(collidables.get(j));
-                if (collisionState != null){
-//                    Movable movable1 = null;
-//                    Movable movable2 = null;
-
-//                    if (collidables.get(i) instanceof Movable){
-//
-//                        if (collidables.get(i).isCircular()) {
-//                            Point2D impactVector = normalizeVector(relativeLocation(collidables.get(i).getAnchor(), collisionState.collisionPoint));
-//                            impactVector = multiplyVector(impactVector ,IMPACT_COEFFICIENT);
-//                            Point2D r2 = addVectors(((Movable) collidables.get(i)).getDirection().getDirectionVector(), impactVector);
-//                            Direction direction = new Direction(r2);
-//                            ((Movable) collidables.get(i)).setDirection(direction);
-//                            movable1 = (Movable) collidables.get(i);
-//                        }
-//                    }
-//                    if (collidables.get(j) instanceof Movable){
-//                        if (collidables.get(j).isCircular()) {
-//                            Point2D impactVector = normalizeVector(relativeLocation(collidables.get(j).getAnchor(), collisionState.collisionPoint));
-//                            impactVector = multiplyVector(impactVector ,IMPACT_COEFFICIENT);
-//                            Point2D r2 = addVectors(((Movable) collidables.get(j)).getDirection().getDirectionVector(), impactVector);
-//                            Direction direction = new Direction(r2);
-//                            ((Movable) collidables.get(j)).setDirection(direction);
-//                            movable1 = (Movable) collidables.get(j);
-//                        }
-//                    }
-//                    if (movable1 != null) movable1.move();
-//                    if (movable2 != null) movable2.move();
-                }
+                collidables.get(i).collides(collidables.get(j));
             }
         }
     }

@@ -1,14 +1,8 @@
 package model.collision;
-
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.LinkedList;
-
 import static controller.Constants.RADIUS;
-import static controller.Utils.*;
 import static model.movement.Movable.movables;
-
-import model.collision.CollisionState;
 import model.movement.Movable;
 
 public interface Collidable {
@@ -16,7 +10,7 @@ public interface Collidable {
     boolean isCircular();
 //    double getRadius();
     Point2D getAnchor();
-    ArrayList<Point2D> getVertices();
+    Point2D[] getVertices();
     default CollisionState collides(Collidable collidable){
         if (isCircular() && !collidable.isCircular()){
             Point2D closest = closestPointOnPolygon(getAnchor(), collidable.getVertices());
@@ -33,11 +27,11 @@ public interface Collidable {
         //TODO neither this or collidable are circular
         return null;
     }
-    default Point2D closestPointOnPolygon(Point2D point, ArrayList<Point2D> vertices){
+    default Point2D closestPointOnPolygon(Point2D point, Point2D[] vertices){
         double minDistance = Double.MAX_VALUE;
         Point2D closest = null;
-        for (int i=0;i<vertices.size();i++){
-            Point2D temp = getClosestPointOnSegment(vertices.get(i),vertices.get((i+1)%vertices.size()),point);
+        for (int i=0;i<vertices.length;i++){
+            Point2D temp = getClosestPointOnSegment(vertices[i],vertices[(i+1)%vertices.length],point);
             double distance = temp.distance(point);
             if (distance < minDistance) {
                 minDistance = distance;
@@ -47,33 +41,23 @@ public interface Collidable {
         return closest;
     }
 
-    default Point2D getIntersectionEdgeNormalVector(Point2D point, ArrayList<Point2D> vertices){
-        if (vertices == null) return null;
-        double minDistance = Double.MAX_VALUE;
-        Point2D edge = null;
-        Point2D normalVector = null;
-        for (int i=0;i<vertices.size();i++){
-            Point2D temp = getClosestPointOnSegment(vertices.get(i),vertices.get((i+1)%vertices.size()),point);
-
-            double distance = temp.distance(point);
-            if (distance < minDistance) {
-                edge = relativeLocation(vertices.get((i+1)%vertices.size()), vertices.get(i));
-                minDistance = distance;
-                normalVector = PerpendicularCounterClockwise(edge);
-//                if (i==0){
-//                    normalVector = PerpendicularCounterClockwise(edge);
-//                } else if (i==1) {
-//                    normalVector = PerpendicularCounterClockwise(edge);
-//                } else if (i==2) {
-//                    normalVector = PerpendicularCounterClockwise(edge);
-//                } else if (i==3) {
-//                    normalVector = PerpendicularCounterClockwise(edge);
-//                }
-
-            }
-        }
-        return edge;
-    }
+//    default Point2D getIntersectionEdgeNormalVector(Point2D point, Point2D[] vertices){
+//        if (vertices == null) return null;
+//        double minDistance = Double.MAX_VALUE;
+//        Point2D edge = null;
+//        Point2D normalVector = null;
+//        for (int i=0;i<vertices.length;i++){
+//            Point2D temp = getClosestPointOnSegment(vertices[i],vertices[(i+1)%vertices.length],point);
+//
+//            double distance = temp.distance(point);
+//            if (distance < minDistance) {
+//                edge = relativeLocation(vertices[(i+1)%vertices.length], vertices[i]);
+//                minDistance = distance;
+//                normalVector = PerpendicularCounterClockwise(edge);
+//            }
+//        }
+//        return edge;
+//    }
 
 
     default Point2D getClosestPointOnSegment(Point2D head1, Point2D head2, Point2D point) {
