@@ -14,8 +14,6 @@ import static model.collision.Collidable.collidables;
 
 public interface Movable {
     boolean isCircular();
-    boolean isImpactInProgress();
-    public void setImpactInProgress(boolean impactInProgress);
     LinkedList<Movable> movables = new LinkedList<>();
     void setDirection(Direction direction);
     Direction getDirection();
@@ -23,7 +21,4 @@ public interface Movable {
     void move();
     void friction();
     Point2D getAnchor();
-    void impact(CollisionState collisionState);
-//        direction.adjustEpsilonDirectionMagnitude();
-    double getImpactCoefficient(Point2D collisionRelativeVector);
-}
+    }

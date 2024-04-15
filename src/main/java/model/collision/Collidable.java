@@ -1,5 +1,4 @@
 package model.collision;
-import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -7,8 +6,6 @@ import java.util.List;
 
 import static controller.Constants.RADIUS;
 import static controller.Utils.*;
-import static model.movement.Movable.movables;
-import model.movement.Movable;
 
 public interface Collidable {
     ArrayList<Collidable> collidables = new ArrayList<>();
@@ -16,34 +13,74 @@ public interface Collidable {
 //    double getRadius();
     Point2D getAnchor();
     Point2D[] getVertices();
-    default CollisionState collides(Collidable collidable){
+    boolean isImpactInProgress();
+    void setImpactInProgress(boolean impactInProgress);
+    void impact(CollisionState collisionState);
+    void impact(Point2D normalVector, CollisionState collisionState);
+    //        direction.adjustEpsilonDirectionMagnitude();
+    double getImpactCoefficient(Point2D collisionRelativeVector);
+
+//    default CollisionState collides(Collidable collidable){
+//        if (isCircular() && !collidable.isCircular()){
+//            Point2D closest = closestPointOnPolygon(getAnchor(), collidable.getVertices());
+//            if (closest.distance(getAnchor()) <= RADIUS) {
+//                for(TrigorathModel trigorathModel: trigorathModels){
+//                    trigorathModel.impact(relativeLocation(closest, getAnchor()), new CollisionState(closest));
+//                }
+//                return new CollisionState(closest);
+//            }
+//        }
+//        else if (!isCircular() && collidable.isCircular()){
+////            return collidable.collides(this);
+//            Point2D closest = closestPointOnPolygon(getAnchor(), collidable.getVertices());
+//            if (closest.distance(getAnchor()) <= RADIUS) {
+//                for(TrigorathModel trigorathModel: trigorathModels){
+//                    trigorathModel.impact(getNormalVector(getAnchor(), collidable), new CollisionState(closest));
+//                }
+//                return new CollisionState(closest);
+//            }
+//        }
+//        //TODO neither this or collidable are circular
+//        else if (!isCircular() && !isCircular()){
+//            List<Point2D> closest = findIntersectionPoints(this, collidable);
+//            if (!closest.isEmpty()){
+//                Point2D intersection = closest.get(0);
+//                for (Movable movable: movables){
+//                    movable.impact(new CollisionState(intersection));
+//                }
+//                return new CollisionState(intersection);
+//
+//            }
+//        }
+//
+//        return null;
+//    }
+
+    default void collides(Collidable collidable){
         if (isCircular() && !collidable.isCircular()){
-            Point2D closest = closestPointOnPolygon(getAnchor(), collidable.getVertices());
-            if (closest.distance(getAnchor()) <= RADIUS) {
-                for (Movable movable: movables){
-                    movable.impact(new CollisionState(closest));
-                }
-                return new CollisionState(closest);
-            }
-        }
-        else if (!isCircular() && collidable.isCircular()){
-            return collidable.collides(this);
-        }
-        //TODO neither this or collidable are circular
-        else if (!isCircular() && !isCircular()){
-            List<Point2D> closest = findIntersectionPoints(this, collidable);
-            if (!closest.isEmpty()){
-                Point2D intersection = closest.get(0);
-                for (Movable movable: movables){
-                    movable.impact(new CollisionState(intersection));
-                }
-                return new CollisionState(intersection);
+            Point2D intersection = closestPointOnPolygon(getAnchor(), collidable.getVertices());
+            if (intersection.distance(getAnchor()) <= RADIUS){
 
-            }
-        }
 
-        return null;
+                for (Collidable coll : collidables){
+//                    if (!coll.isImpactInProgress())
+//                        coll.impact(new CollisionState(intersection));
+                    if (coll == collidable){
+                        coll.impact(relativeLocation(intersection, getAnchor()), new CollisionState(intersection));
+                    } else if (coll == this){
+                        coll.impact(relativeLocation(getAnchor(), intersection), new CollisionState(intersection));
+                    } else {
+                        coll.impact(new CollisionState(intersection));
+                    }
+                }
+            }
+
+        } else if (!isCircular() && collidable.isCircular()){
+            collidable.collides(this);
+        }
     }
+
+
     default Point2D closestPointOnPolygon(Point2D point, Point2D[] vertices){
         double minDistance = Double.MAX_VALUE;
         Point2D closest = null;
@@ -58,7 +95,7 @@ public interface Collidable {
         return closest;
     }
 
-    default Point2D getIntersectionEdgeNormalVector(Point2D point, Collidable collidable){
+    default Point2D getCollisionNormalVector(Point2D point, Collidable collidable){
         double minDistance = Double.MAX_VALUE;
         Point2D normalVector = null;
         if (collidable.isCircular()){
@@ -77,11 +114,8 @@ public interface Collidable {
                 }
             }
         }
-
         return normalVector;
     }
-
-
 
     default boolean doPolygonsIntersect(Collidable poly1, Collidable poly2) {
         // Combine both polygons' vertices; assume they are defined in a clockwise manner

@@ -90,6 +90,15 @@ public class TrigorathModel implements Movable, Collidable {
         }
     }
 
+    public void impact(Point2D normalVector, CollisionState collisionState) {
+        Point2D collisionPoint = collisionState.collisionPoint;
+        Point2D collisionRelativeVector = relativeLocation(this.getAnchor(), collisionPoint);
+        double impactCoefficient = getImpactCoefficient(collisionRelativeVector);
+        Point2D impactVector = reflect(normalVector);
+        impactVector = multiplyVector(impactVector ,impactCoefficient);
+        this.setDirection(new Direction(normalizeVector(impactVector)));
+    }
+
     @Override
     public double getImpactCoefficient(Point2D collisionRelativeVector) {
         double distance = Math.hypot(collisionRelativeVector.getX(), collisionRelativeVector.getY());
@@ -155,18 +164,18 @@ public class TrigorathModel implements Movable, Collidable {
         this.angle = angle;
     }
     public void rotate(){
-//        angle += angularVelocity;
+        angle += angularVelocity;
         vertices[0] = new Point2D.Double(anchor.getX()-radius*Math.sin(angle), anchor.getY()-radius*Math.cos(angle));
         vertices[1] = new Point2D.Double(anchor.getX()+radius*Math.cos(Math.PI/6-angle), anchor.getY()+radius*Math.sin(Math.PI/6-angle));
         vertices[2] = new Point2D.Double(anchor.getX()-radius*Math.cos(Math.PI/6+angle), anchor.getY()+radius*Math.sin(Math.PI/6+angle));
 
     }
-    public void reflect(Point2D normalVector){
+    public Point2D reflect(Point2D normalVector){
         double dotProduct = dotVectors(getDirection().getDirectionVector(), normalVector);
         Point2D reflection = addVectors(
                 getDirection().getDirectionVector(),
                 multiplyVector(normalVector,-2*dotProduct
                 ));
-        setDirection(new Direction(reflection));
+        return normalizeVector(reflection);
     }
 }

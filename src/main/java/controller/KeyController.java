@@ -17,7 +17,7 @@ import static controller.Utils.multiplyVector;
 public class KeyController implements KeyListener {
     private Set<Integer> keysPressed = new HashSet<>();
     private boolean movementInProgress = false;
-    private final int MOVEMENT_DELAY = 50; // Delay in milliseconds
+    private final int MOVEMENT_DELAY = 60; // Delay in milliseconds
     private Timer movementTimer;
 
     public KeyController() {

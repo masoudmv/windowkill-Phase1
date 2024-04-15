@@ -95,6 +95,20 @@ public class EpsilonModel implements Movable, Collidable {
         }
     }
 
+    public void impact(Point2D normalVector, CollisionState collisionState) {
+        Point2D collisionPoint = collisionState.collisionPoint;
+        Point2D collisionRelativeVector = relativeLocation(this.getAnchor(), collisionPoint);
+        double impactCoefficient = getImpactCoefficient(collisionRelativeVector);
+        Point2D impactVector = reflect(normalVector);
+        impactVector = multiplyVector(impactVector ,impactCoefficient);
+        if (this.getDirection().getMagnitude() < 2){
+            setDirection(new Direction(normalizeVector(relativeLocation(getAnchor(), collisionPoint))));
+        }
+        else {
+            setDirection(new Direction(normalizeVector(impactVector)));
+        }
+    }
+
     @Override
     public double getImpactCoefficient(Point2D collisionRelativeVector) {
         double distance = Math.hypot(collisionRelativeVector.getX(), collisionRelativeVector.getY());
@@ -149,5 +163,14 @@ public class EpsilonModel implements Movable, Collidable {
             }
         }
 
+    }
+
+    public Point2D reflect(Point2D normalVector){
+        double dotProduct = dotVectors(getDirection().getDirectionVector(), normalVector);
+        Point2D reflection = addVectors(
+                getDirection().getDirectionVector(),
+                multiplyVector(normalVector,-2*dotProduct
+                ));
+        return normalizeVector(reflection);
     }
 }

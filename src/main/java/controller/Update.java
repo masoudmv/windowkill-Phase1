@@ -32,7 +32,7 @@ public class Update {
 
 
     public Update() {
-        new Timer((int) FRAME_UPDATE_TIME, e -> updateView()){{setCoalesce(true);}}.start();
+        new Timer((int) 5, e -> updateView()){{setCoalesce(true);}}.start();
 
 //        new Timer((int) MODEL_UPDATE_TIME, e -> updateModel()){{setCoalesce(true);}}.start();
 
@@ -50,7 +50,7 @@ public class Update {
         // Check if one second has passed
         if (currentTime - lastUpdateTime >= 1000) {
             // Print the FPS (which is frameCount since it's been a second)
-//            System.out.println("FPS: " + frameCount);
+            System.out.println("FPS: " + frameCount);
 
             // Reset frame counter and last update time for the next second
             frameCount = 0;
@@ -104,7 +104,7 @@ public class Update {
         // Check if one second has passed
         if (currentTime - lastUpdateTimeUPS >= 1000) {
             // Print the FPS (which is frameCount since it's been a second)
-            System.out.println("UPS: " + updateCount);
+//            System.out.println("UPS: " + updateCount);
 
             // Reset frame counter and last update time for the next second
             updateCount = 0;
