@@ -1,5 +1,6 @@
 package controller;
 
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.Vector;
 
@@ -37,6 +38,32 @@ public class Utils {
     public static Point2D PerpendicularCounterClockwise(Point2D vector)
     {
         return new Point2D.Double(-vector.getY(), vector.getX());
+    }
+
+//    public static Point2D PerpendicularVector(Line2D line2D)
+//    {
+//        return new Point2D.Double(-vector.getY(), vector.getX());
+//    }
+
+    public static Point2D getIntersectionPoint(Line2D line1, Line2D line2) {
+        if (!line1.intersectsLine(line2)) return null;
+
+        double px = line1.getX1(),
+                py = line1.getY1(),
+                rx = line1.getX2() - px,
+                ry = line1.getY2() - py;
+        double qx = line2.getX1(),
+                qy = line2.getY1(),
+                sx = line2.getX2() - qx,
+                sy = line2.getY2() - qy;
+
+        double det = rx * sy - ry * sx;
+        if (det == 0) {
+            return null;  // Lines are parallel
+        } else {
+            double t = ((qx - px) * sy - (qy - py) * sx) / det;
+            return new Point2D.Double(px + t * rx, py + t * ry);
+        }
     }
 
 }

@@ -6,6 +6,7 @@ import model.collision.CollisionState;
 import model.movement.Direction;
 import model.movement.Movable;
 
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -20,10 +21,14 @@ public class TrigorathModel implements Movable, Collidable {
     Point2D currentLocation;
     double radius;
     String id;
+    public double impactMaxVelocity;
     Direction direction;
+
     private boolean impactInProgress = false;
     public static ArrayList<TrigorathModel> trigorathModels =new ArrayList<>();
     private final Point2D[] vertices;
+    private double angle = 0;
+    private double angularVelocity = Math.PI/100;
 
     public TrigorathModel(Point2D anchor) {
         this.anchor = anchor;
@@ -70,12 +75,39 @@ public class TrigorathModel implements Movable, Collidable {
 
     @Override
     public void impact(CollisionState collisionState) {
-
+        Point2D collisionPoint = collisionState.collisionPoint;
+        Point2D collisionRelativeVector = relativeLocation(this.getAnchor(), collisionPoint);
+        double impactCoefficient = getImpactCoefficient(collisionRelativeVector);
+        Point2D impactVector = normalizeVector(relativeLocation(this.getAnchor(), collisionState.collisionPoint));
+        impactVector = multiplyVector(impactVector ,impactCoefficient);
+        Point2D r2 = addVectors(this.getDirection().getNormalizedDirectionVector(), impactVector);
+        if(!isCircular()){
+            Direction direction = new Direction(normalizeVector(r2));
+            this.setDirection(direction);
+        } else {
+            Direction direction = new Direction(normalizeVector(r2));
+            this.setDirection(direction);
+        }
     }
 
     @Override
     public double getImpactCoefficient(Point2D collisionRelativeVector) {
-        return 0;
+        double distance = Math.hypot(collisionRelativeVector.getX(), collisionRelativeVector.getY());
+        double impactCoefficient;
+        if (distance < SMALL_IMPACT_RADIUS) {
+            setImpactInProgress(true);
+            impactMaxVelocity = 2 * IMPACT_COEFFICIENT / 5;
+            impactCoefficient = IMPACT_COEFFICIENT;
+        } else if (distance > (LARGE_IMPACT_RADIUS + SMALL_IMPACT_RADIUS) /2) {
+            setImpactInProgress(false);
+            impactCoefficient = 0;
+        } else {
+            setImpactInProgress(true);
+            double coefficient = 1 - (distance- SMALL_IMPACT_RADIUS)/(LARGE_IMPACT_RADIUS - SMALL_IMPACT_RADIUS);
+            impactCoefficient = coefficient * IMPACT_COEFFICIENT;
+            impactMaxVelocity = 2 * coefficient * IMPACT_COEFFICIENT / 5;
+        }
+        return impactCoefficient;
     }
 
     @Override
@@ -113,5 +145,28 @@ public class TrigorathModel implements Movable, Collidable {
                     new Direction(relativeLocation(EpsilonModel.getINSTANCE().getAnchor(), getAnchor())));
             getDirection().adjustDirectionMagnitude();
         }
+    }
+
+    public double getAngle() {
+        return angle;
+    }
+
+    public void setAngle(double angle) {
+        this.angle = angle;
+    }
+    public void rotate(){
+//        angle += angularVelocity;
+        vertices[0] = new Point2D.Double(anchor.getX()-radius*Math.sin(angle), anchor.getY()-radius*Math.cos(angle));
+        vertices[1] = new Point2D.Double(anchor.getX()+radius*Math.cos(Math.PI/6-angle), anchor.getY()+radius*Math.sin(Math.PI/6-angle));
+        vertices[2] = new Point2D.Double(anchor.getX()-radius*Math.cos(Math.PI/6+angle), anchor.getY()+radius*Math.sin(Math.PI/6+angle));
+
+    }
+    public void reflect(Point2D normalVector){
+        double dotProduct = dotVectors(getDirection().getDirectionVector(), normalVector);
+        Point2D reflection = addVectors(
+                getDirection().getDirectionVector(),
+                multiplyVector(normalVector,-2*dotProduct
+                ));
+        setDirection(new Direction(reflection));
     }
 }

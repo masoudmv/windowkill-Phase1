@@ -17,6 +17,8 @@ public class SquarantineModel implements Movable, Collidable {
     private Point2D anchor;
     Point2D currentLocation;
     public double impactMaxVelocity;
+    private double angle = 0;
+    private double angularVelocity = 0;
     double radius;
     String id;
     Direction direction;
@@ -141,4 +143,16 @@ public class SquarantineModel implements Movable, Collidable {
             getDirection().adjustDirectionMagnitude();
         }
     }
+
+    public double getAngle() {
+        return angle;
+    }
+
+    public void setAngle(double angle) {
+        this.angle = angle;
+    }
+    public void rotate(){
+
+    }
+
 }

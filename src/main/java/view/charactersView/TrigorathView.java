@@ -10,6 +10,10 @@ import static controller.Constants.TRIGORATH_RADIUS;
 public class TrigorathView implements Drawable{
     String id;
     Point2D currentLocation = new Point2D.Double(0,0);
+    Point2D point1= new Point2D.Double(0,0);
+    Point2D point2= new Point2D.Double(0,0);
+    Point2D point3= new Point2D.Double(0,0);
+    private Point2D[] vertices = new Point2D[]{point1,point2,point3};
     public static ArrayList<TrigorathView> trigorathViews=new ArrayList<>();
     public TrigorathView(String id) {
         this.id = id;
@@ -31,12 +35,26 @@ public class TrigorathView implements Drawable{
 
     @Override
     public void draw(Graphics g) {
-        g.setColor(Color.black);
+
         Point2D location = this.getCurrentLocation();
         double radius = TRIGORATH_RADIUS;
-        int[] xPoly = {(int) location.getX(), (int) (location.getX()+ radius*Math.cos(Math.PI/6)), (int) (location.getX()-radius*Math.cos(Math.PI/6))};
-        int[] yPoly = {(int) (location.getY()-radius), (int) (location.getY()+radius/2), (int) (location.getY()+radius/2)};
+//        int[] xPoly = {(int) location.getX(), (int) (location.getX()+ radius*Math.cos(Math.PI/6)), (int) (location.getX()-radius*Math.cos(Math.PI/6))};
+//        int[] yPoly = {(int) (location.getY()-radius), (int) (location.getY()+radius/2), (int) (location.getY()+radius/2)};
+        int[] xPoly = new int[]{(int) vertices[0].getX(), (int) vertices[1].getX(), (int) vertices[2].getX()};
+        int[] yPoly = new int[]{(int) vertices[0].getY(), (int) vertices[1].getY(), (int) vertices[2].getY()};
+
+//        Polygon polygon = new Polygon(vertices[0], vertices[1], vertices[2], 3);
+//        System.out.println("dsds");
+        g.setColor(Color.black);
+
+
+
+
         Polygon poly = new Polygon(xPoly, yPoly, xPoly.length);
         g.fillPolygon(poly);
+    }
+
+    public void setVertices(Point2D[] vertices) {
+        this.vertices = vertices;
     }
 }

@@ -34,11 +34,15 @@ public abstract class Controller {
         assert squarantineModel != null;
         return relativeLocation(squarantineModel.getAnchor(),corner);
     }
-    public static Point2D calculateViewLocationTrigorath(Component component, String id){
+    public static Point2D[] calculateViewLocationTrigorath(Component component, String id){
         TrigorathModel trigorathModel = findTrigorathModel(id);
         Point corner=new Point(component.getX(),component.getY());
         assert trigorathModel != null;
-        return relativeLocation(trigorathModel.getAnchor(),corner);
+//        return relativeLocation(trigorathModel.getAnchor(),corner);
+        Point2D point1 = relativeLocation(trigorathModel.getVertices()[0], corner);
+        Point2D point2 = relativeLocation(trigorathModel.getVertices()[1], corner);
+        Point2D point3 = relativeLocation(trigorathModel.getVertices()[2], corner);
+        return new Point2D[]{point1, point2, point3};
     }
 
     public static EpsilonModel findModel(String id){

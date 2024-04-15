@@ -31,7 +31,15 @@ public class SquarantineView implements Drawable{
     public void draw(Graphics g){
         g.setColor(Color.BLACK);
         Point2D location = this.getCurrentLocation();
-        g.fillRect((int)location.getX()-SQUARANTINE_EDGE/2, (int)location.getY()-SQUARANTINE_EDGE/2, SQUARANTINE_EDGE, SQUARANTINE_EDGE);
+        Graphics2D g2d = (Graphics2D) g.create();
+        g2d.setColor(Color.black);
+        Rectangle rect2 = new Rectangle(
+                (int)location.getX()-SQUARANTINE_EDGE/2, (int)location.getY()-SQUARANTINE_EDGE/2,
+                SQUARANTINE_EDGE, SQUARANTINE_EDGE);
+
+//        g2d.rotate(Math.toRadians(5));
+        g2d.draw(rect2);
+        g2d.fill(rect2);
     }
 
 }

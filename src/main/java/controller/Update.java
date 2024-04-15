@@ -2,6 +2,7 @@ package controller;
 
 import model.charactersModel.EpsilonModel;
 import model.charactersModel.SquarantineModel;
+import model.charactersModel.TrigorathModel;
 import model.collision.CollisionState;
 import model.movement.Movable;
 import view.charactersView.SquarantineView;
@@ -15,6 +16,7 @@ import javax.swing.*;
 import static controller.Constants.*;
 import static controller.Controller.*;
 import static model.charactersModel.SquarantineModel.squarantineModels;
+import static model.charactersModel.TrigorathModel.trigorathModels;
 import static model.collision.Collidable.collidables;
 import static model.movement.Movable.movables;
 import static view.charactersView.SquarantineView.squarantineViews;
@@ -62,7 +64,8 @@ public class Update {
             squarantineView.setCurrentLocation(calculateViewLocationSquarantine(mainPanel.getINSTANCE(),squarantineView.getId()));
         }
         for (TrigorathView trigorathView : trigorathViews){
-            trigorathView.setCurrentLocation(calculateViewLocationTrigorath(mainPanel.getINSTANCE(),trigorathView.getId()));
+//            trigorathView.setCurrentLocation(calculateViewLocationTrigorath(mainPanel.getINSTANCE(),trigorathView.getId()));
+            trigorathView.setVertices(calculateViewLocationTrigorath(mainPanel.getINSTANCE(), trigorathView.getId()));
         }
         myFrame.getINSTANCE().repaint();
     }
@@ -76,6 +79,14 @@ public class Update {
                 squarantineModel.getDirection().accelerateDirection(squarantineModel.impactMaxVelocity);
                 if (squarantineModel.getDirection().getMagnitude() > squarantineModel.impactMaxVelocity){
                     squarantineModel.setImpactInProgress(false);
+                }
+            }
+        }
+        for (TrigorathModel trigorathModel: trigorathModels){
+            if (trigorathModel.isImpactInProgress()){
+                trigorathModel.getDirection().accelerateDirection(trigorathModel.impactMaxVelocity);
+                if (trigorathModel.getDirection().getMagnitude() > trigorathModel.impactMaxVelocity){
+                    trigorathModel.setImpactInProgress(false);
                 }
             }
         }
@@ -102,6 +113,9 @@ public class Update {
         for (Movable movable: movables){
             movable.move();
             movable.friction();
+        }
+        for (TrigorathModel t:trigorathModels){
+            t.rotate();
         }
         for (int i=0;i<collidables.size();i++){
             for (int j=i+1;j<collidables.size();j++){
