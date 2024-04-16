@@ -50,7 +50,7 @@ public class Update {
         // Check if one second has passed
         if (currentTime - lastUpdateTime >= 1000) {
             // Print the FPS (which is frameCount since it's been a second)
-            System.out.println("FPS: " + frameCount);
+//            System.out.println("FPS: " + frameCount);
 
             // Reset frame counter and last update time for the next second
             frameCount = 0;
@@ -61,7 +61,7 @@ public class Update {
             epsilonView.setCurrentLocation(calculateViewLocationEpsilon(mainPanel.getINSTANCE(),epsilonView.getId()));
         }
         for (SquarantineView squarantineView: squarantineViews){
-            squarantineView.setCurrentLocation(calculateViewLocationSquarantine(mainPanel.getINSTANCE(),squarantineView.getId()));
+            squarantineView.setVertices(calculateViewLocationSquarantine(mainPanel.getINSTANCE(),squarantineView.getId()));
         }
         for (TrigorathView trigorathView : trigorathViews){
 //            trigorathView.setCurrentLocation(calculateViewLocationTrigorath(mainPanel.getINSTANCE(),trigorathView.getId()));
@@ -116,6 +116,8 @@ public class Update {
         }
         for (TrigorathModel t:trigorathModels){
             t.rotate();
+        } for (SquarantineModel s:squarantineModels){
+            s.rotate();
         }
         for (int i=0;i<collidables.size();i++){
             for (int j=i+1;j<collidables.size();j++){

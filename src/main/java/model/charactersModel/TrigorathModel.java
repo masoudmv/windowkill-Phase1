@@ -27,8 +27,9 @@ public class TrigorathModel implements Movable, Collidable {
     private boolean impactInProgress = false;
     public static ArrayList<TrigorathModel> trigorathModels =new ArrayList<>();
     private final Point2D[] vertices;
-    private double angle = 0;
-    private double angularVelocity = Math.PI/100;
+    private double angle;
+    private double angularVelocity;
+    private double angularAcceleration;
 
     public TrigorathModel(Point2D anchor) {
         this.anchor = anchor;
@@ -91,12 +92,20 @@ public class TrigorathModel implements Movable, Collidable {
     }
 
     public void impact(Point2D normalVector, CollisionState collisionState) {
+        System.out.println(normalVector);
         Point2D collisionPoint = collisionState.collisionPoint;
         Point2D collisionRelativeVector = relativeLocation(this.getAnchor(), collisionPoint);
         double impactCoefficient = getImpactCoefficient(collisionRelativeVector);
         Point2D impactVector = reflect(normalVector);
         impactVector = multiplyVector(impactVector ,impactCoefficient);
         this.setDirection(new Direction(normalizeVector(impactVector)));
+        // Angular motion
+        Point2D r = relativeLocation(collisionPoint, anchor);
+        Point2D f = normalVector;
+        double torque = -r.getX()*f.getY()+r.getY()*f.getX();
+        double momentOfInertia = calculateTrigorathInertia();
+        angularAcceleration = torque/momentOfInertia;
+        angularVelocity = 0;
     }
 
     @Override
@@ -164,6 +173,28 @@ public class TrigorathModel implements Movable, Collidable {
         this.angle = angle;
     }
     public void rotate(){
+//        System.out.println(angularVelocity);
+//        angularVelocity *= 0.99;
+//        if (Math.abs(angularVelocity) < 0.001) {
+//            angularVelocity = 0;
+//        }
+        if (Math.abs(angularVelocity) < 0.0001 && angularAcceleration ==0){
+            angularVelocity = 0;
+        }
+
+        // Angular Friction
+        if (angularVelocity<0 && angularAcceleration==0){
+            angularVelocity += 0.0005;
+        } else if (angularVelocity>0 && angularAcceleration==0) {
+            angularVelocity -= 0.0005;
+        }
+
+
+
+        if (Math.abs(angularVelocity) < Math.abs(angularAcceleration*10)) {
+            angularVelocity += angularAcceleration;
+        }
+        else angularAcceleration = 0;
         angle += angularVelocity;
         vertices[0] = new Point2D.Double(anchor.getX()-radius*Math.sin(angle), anchor.getY()-radius*Math.cos(angle));
         vertices[1] = new Point2D.Double(anchor.getX()+radius*Math.cos(Math.PI/6-angle), anchor.getY()+radius*Math.sin(Math.PI/6-angle));
@@ -177,5 +208,11 @@ public class TrigorathModel implements Movable, Collidable {
                 multiplyVector(normalVector,-2*dotProduct
                 ));
         return normalizeVector(reflection);
+    }
+    private double calculateTrigorathInertia(){
+        double mass = 100;
+        double length = TRIGORATH_RADIUS* (1.5);
+//        System.out.println(mass*length*length/12);
+        return 50000;
     }
 }

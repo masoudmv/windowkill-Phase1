@@ -24,8 +24,10 @@ public class Main {
             new KeyController();
             new EpsilonModel(new Point2D.Double((double) myFrame.getINSTANCE().getWidth() /2,(double) myFrame.getINSTANCE().getHeight() /2));
             new SquarantineModel(new Point2D.Double(500,500), (double) SQUARANTINE_EDGE /2);
-            new SquarantineModel(new Point2D.Double(500,700), (double) SQUARANTINE_EDGE /2);
+//            new SquarantineModel(new Point2D.Double(500,700), (double) SQUARANTINE_EDGE /2);
 //            new TrigorathModel(new Point2D.Double(700,700));
+//            new TrigorathModel(new Point2D.Double(700,800));
+            new TrigorathModel(new Point2D.Double(300,900));
         });
     }
 }

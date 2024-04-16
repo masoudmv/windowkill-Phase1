@@ -13,11 +13,13 @@ public class Constants {
     public static final double EPSILON_MAX_SPEED = 4;
     public static final double SPEED = 1;
     public static final double RADIUS = 15;
-    public static final int SQUARANTINE_EDGE = 50;
-    public static final double TRIGORATH_RADIUS = 30;
+    public static final int SQUARANTINE_EDGE = 60;
+    public static final double SQUARANTINE_RADIUS = SQUARANTINE_EDGE/Math.sqrt(2);
+    public static final double TRIGORATH_RADIUS = 40;
     public static final double TRIGORATH_EDGE = 50;
     public static final double FRICTION = 0.97;
     public static final double IMPACT_COEFFICIENT = 6;
     public static final double SMALL_IMPACT_RADIUS = 50;
     public static final double LARGE_IMPACT_RADIUS = 300;
+    public static final double PI = Math.PI;
 }

@@ -77,6 +77,25 @@ public interface Collidable {
 
         } else if (!isCircular() && collidable.isCircular()){
             collidable.collides(this);
+        } else if (!isCircular() && !collidable.isCircular()){
+            Point2D intersection = findSingleIntersectionPoint(this, collidable);
+            if (intersection!=null) {
+//                Point2D intersection = closest.get(0);
+                for (Collidable coll : collidables){
+//                    coll.impact(new CollisionState(intersection));
+                    if (!coll.isImpactInProgress())
+                        coll.impact(new CollisionState(intersection));
+                    if (coll == collidable){
+                        collidable.impact(getCollisionNormalVector(collidable.getAnchor(), this), new CollisionState(intersection));
+                    } else if (coll == this){
+                        this.impact(getCollisionNormalVector(this.getAnchor(), collidable), new CollisionState(intersection));
+                    } else {
+                        coll.impact(new CollisionState(intersection));
+                    }
+                }
+//                return new CollisionState(intersection);
+
+            }
         }
     }
 
@@ -164,7 +183,27 @@ public interface Collidable {
     }
 
     // Method to find all intersection points between two polygons
-    public static List<Point2D> findIntersectionPoints(Collidable poly1, Collidable poly2) {
+    private static Point2D getIntersectionPoint(Line2D line1, Line2D line2) {
+        if (!line1.intersectsLine(line2)) return null;
+
+        double px = line1.getX1(),
+                py = line1.getY1(),
+                rx = line1.getX2() - px,
+                ry = line1.getY2() - py;
+        double qx = line2.getX1(),
+                qy = line2.getY1(),
+                sx = line2.getX2() - qx,
+                sy = line2.getY2() - qy;
+
+        double det = rx * sy - ry * sx;
+        if (det == 0) {
+            return null;  // Lines are parallel
+        } else {
+            double t = ((qx - px) * sy - (qy - py) * sx) / det;
+            return new Point2D.Double(px + t * rx, py + t * ry);
+        }
+    }
+    public static Point2D findSingleIntersectionPoint(Collidable poly1, Collidable poly2) {
         List<Point2D> intersectionPoints = new ArrayList<>();
 
         Point2D[] vertices1 = poly1.getVertices();
@@ -181,6 +220,38 @@ public interface Collidable {
                 }
             }
         }
-        return intersectionPoints;
+
+        // Determine the strategy for returning a single intersection point
+        if (intersectionPoints.isEmpty()) {
+            return null;  // No intersections
+        } else if (intersectionPoints.size() == 1) {
+            return intersectionPoints.get(0);
+        } else {
+            // Find centroid or closest vertex
+            Point2D centroid = intersectionPoints.stream()
+                    .reduce(new Point2D.Double(0, 0), (acc, p) -> {
+                        acc.setLocation(acc.getX() + p.getX(), acc.getY() + p.getY());
+                        return acc;
+                    });
+            centroid.setLocation(centroid.getX() / intersectionPoints.size(), centroid.getY() / intersectionPoints.size());
+
+            double minDistance = Double.MAX_VALUE;
+            Point2D closestVertex = null;
+            for (Point2D vertex : vertices1) { // Check vertices of polygon 1
+                double distance = centroid.distance(vertex);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestVertex = vertex;
+                }
+            }
+            for (Point2D vertex : vertices2) { // Check vertices of polygon 2
+                double distance = centroid.distance(vertex);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestVertex = vertex;
+                }
+            }
+            return closestVertex; // Nearest vertex to centroid of all intersection points
+        }
     }
 }

@@ -5,6 +5,7 @@ import model.collision.CollisionState;
 import model.movement.Direction;
 import model.movement.Movable;
 
+import javax.swing.plaf.IconUIResource;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -17,14 +18,17 @@ public class SquarantineModel implements Movable, Collidable {
     private Point2D anchor;
     Point2D currentLocation;
     public double impactMaxVelocity;
-    private double angle = 0;
-    private double angularVelocity = 0;
     double radius;
     String id;
     Direction direction;
     private boolean impactInProgress = false;
     private final Point2D[] vertices;
     public static ArrayList<SquarantineModel> squarantineModels =new ArrayList<>();
+
+    private double angle;
+    private double angularVelocity;
+    private double angularAcceleration;
+
 
     public SquarantineModel(Point2D anchor, double radius) {
         this.anchor = anchor;
@@ -94,6 +98,14 @@ public class SquarantineModel implements Movable, Collidable {
         Point2D impactVector = reflect(normalVector);
         impactVector = multiplyVector(impactVector ,impactCoefficient);
         this.setDirection(new Direction(normalizeVector(impactVector)));
+        // Angular motion
+        Point2D r = relativeLocation(collisionPoint, anchor);
+        Point2D f = normalVector;
+        double torque = -r.getX()*f.getY()+r.getY()*f.getX();
+//        System.out.println(torque);
+        double momentOfInertia = calculateSquarantineInertia();
+        angularAcceleration = torque/momentOfInertia;
+        angularVelocity = 0;
     }
 
     @Override
@@ -161,6 +173,45 @@ public class SquarantineModel implements Movable, Collidable {
         this.angle = angle;
     }
     public void rotate(){
+//        System.out.println(angularVelocity);
+//        angularVelocity *= 0.99;
+//        if (Math.abs(angularVelocity) < 0.001) {
+//            angularVelocity = 0;
+//        }
+        if (Math.abs(angularVelocity) < 0.0001 && angularAcceleration ==0){
+            angularVelocity = 0;
+        }
+
+        // Angular Friction
+        if (angularVelocity<0 && angularAcceleration==0){
+            angularVelocity += 0.0005;
+        } else if (angularVelocity>0 && angularAcceleration==0) {
+            angularVelocity -= 0.0005;
+        }
+
+
+
+        if (Math.abs(angularVelocity) < Math.abs(angularAcceleration*10)) {
+            angularVelocity += angularAcceleration;
+        }
+        else angularAcceleration = 0;
+        angle += angularVelocity;
+        vertices[0] = new Point2D.Double(
+                (anchor.getX()-SQUARANTINE_RADIUS*Math.sin(PI/4+angle)),
+                (anchor.getY()-SQUARANTINE_RADIUS*Math.cos(PI/4+angle))
+        );
+        vertices[1] = new Point2D.Double(
+                (anchor.getX()+SQUARANTINE_RADIUS*Math.cos(PI/4+angle)),
+                (anchor.getY()-SQUARANTINE_RADIUS*Math.sin(PI/4+angle))
+        );
+        vertices[2] = new Point2D.Double(
+                (anchor.getX()+SQUARANTINE_RADIUS*Math.cos(PI/4-angle)),
+                (anchor.getY()+SQUARANTINE_RADIUS*Math.sin(PI/4-angle))
+        );
+        vertices[3] = new Point2D.Double(
+                (anchor.getX()-SQUARANTINE_RADIUS*Math.sin(PI/4-angle)),
+                (anchor.getY()+SQUARANTINE_RADIUS*Math.cos(PI/4-angle))
+        );
 
     }
     public Point2D reflect(Point2D normalVector){
@@ -170,6 +221,14 @@ public class SquarantineModel implements Movable, Collidable {
                 multiplyVector(normalVector,-2*dotProduct
                 ));
         return normalizeVector(reflection);
+    }
+    private double calculateSquarantineInertia() {
+        double mass = 200;
+        double height = SQUARANTINE_EDGE;
+        double width = SQUARANTINE_EDGE;
+//        System.out.println(mass*(height*height+width*width)/12);
+        return 50000;
+
     }
 
 }

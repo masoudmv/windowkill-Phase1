@@ -10,6 +10,11 @@ public class SquarantineView implements Drawable{
     String id;
     Point2D currentLocation=new Point2D.Double(0,0);
     public static ArrayList<SquarantineView> squarantineViews=new ArrayList<>();
+    Point2D point1= new Point2D.Double(0,0);
+    Point2D point2= new Point2D.Double(0,0);
+    Point2D point3= new Point2D.Double(0,0);
+    Point2D point4= new Point2D.Double(0,0);
+    private Point2D[] vertices = new Point2D[]{point1,point2,point3,point4};
     public SquarantineView(String id) {
         this.id = id;
         squarantineViews.add(this);
@@ -29,17 +34,14 @@ public class SquarantineView implements Drawable{
     }
     @Override
     public void draw(Graphics g){
-        g.setColor(Color.BLACK);
-        Point2D location = this.getCurrentLocation();
-        Graphics2D g2d = (Graphics2D) g.create();
-        g2d.setColor(Color.black);
-        Rectangle rect2 = new Rectangle(
-                (int)location.getX()-SQUARANTINE_EDGE/2, (int)location.getY()-SQUARANTINE_EDGE/2,
-                SQUARANTINE_EDGE, SQUARANTINE_EDGE);
-
-//        g2d.rotate(Math.toRadians(5));
-        g2d.draw(rect2);
-        g2d.fill(rect2);
+        int[] xPoly = new int[]{(int) vertices[0].getX(), (int) vertices[1].getX(), (int) vertices[2].getX(), (int) vertices[3].getX()};
+        int[] yPoly = new int[]{(int) vertices[0].getY(), (int) vertices[1].getY(), (int) vertices[2].getY(), (int) vertices[3].getY()};
+        g.setColor(Color.black);
+        Polygon poly = new Polygon(xPoly, yPoly, xPoly.length);
+        g.fillPolygon(poly);
     }
 
+    public void setVertices(Point2D[] vertices) {
+        this.vertices = vertices;
+    }
 }
