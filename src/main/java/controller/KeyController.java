@@ -14,7 +14,7 @@ import static controller.Utils.addVectors;
 import static controller.Utils.multiplyVector;
 
 
-public class KeyController implements KeyListener {
+public class KeyController extends Thread implements KeyListener {
     private Set<Integer> keysPressed = new HashSet<>();
     private boolean movementInProgress = false;
     private final int MOVEMENT_DELAY = 60; // Delay in milliseconds

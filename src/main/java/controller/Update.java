@@ -15,6 +15,7 @@ import javax.swing.*;
 
 import static controller.Constants.*;
 import static controller.Controller.*;
+//import static jdk.jfr.internal.consumer.EventLog.start;
 import static model.charactersModel.SquarantineModel.squarantineModels;
 import static model.charactersModel.TrigorathModel.trigorathModels;
 import static model.collision.Collidable.collidables;
@@ -32,7 +33,14 @@ public class Update {
 
 
     public Update() {
+
+
+
+        Thread thread = new Thread(
+
+        );
         new Timer((int) 5, e -> updateView()){{setCoalesce(true);}}.start();
+//        new Thread(5 ) 5, e -> updateView().start()
 
 //        new Timer((int) MODEL_UPDATE_TIME, e -> updateModel()){{setCoalesce(true);}}.start();
 
@@ -50,7 +58,7 @@ public class Update {
         // Check if one second has passed
         if (currentTime - lastUpdateTime >= 1000) {
             // Print the FPS (which is frameCount since it's been a second)
-//            System.out.println("FPS: " + frameCount);
+            System.out.println("FPS: " + frameCount);
 
             // Reset frame counter and last update time for the next second
             frameCount = 0;
@@ -114,11 +122,11 @@ public class Update {
             movable.move();
             movable.friction();
         }
-        for (TrigorathModel t:trigorathModels){
-            t.rotate();
-        } for (SquarantineModel s:squarantineModels){
-            s.rotate();
-        }
+//        for (TrigorathModel t:trigorathModels){
+//            t.rotate();
+//        } for (SquarantineModel s:squarantineModels){
+//            s.rotate();
+//        }
         for (int i=0;i<collidables.size();i++){
             for (int j=i+1;j<collidables.size();j++){
                 collidables.get(i).collides(collidables.get(j));

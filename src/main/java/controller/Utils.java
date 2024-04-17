@@ -39,6 +39,9 @@ public class Utils {
     {
         return new Point2D.Double(-vector.getY(), vector.getX());
     }
+    public static Point2D findMidPoint(Point2D point1, Point2D point2){
+        return new Point2D.Double((point1.getX()+point1.getX())/2, (point2.getY()+point2.getY())/2);
+    }
 
 //    public static Point2D PerpendicularVector(Line2D line2D)
 //    {

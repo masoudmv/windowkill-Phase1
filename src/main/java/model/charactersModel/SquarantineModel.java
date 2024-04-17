@@ -30,9 +30,9 @@ public class SquarantineModel implements Movable, Collidable {
     private double angularAcceleration;
 
 
-    public SquarantineModel(Point2D anchor, double radius) {
+    public SquarantineModel(Point2D anchor) {
         this.anchor = anchor;
-        this.radius = radius;
+        this.radius = (double) SQUARANTINE_EDGE /2;
         Point2D point1 = new Point2D.Double((anchor.getX()- (double) SQUARANTINE_EDGE /2), (anchor.getY()- (double) SQUARANTINE_EDGE /2));
         Point2D point2 = new Point2D.Double((anchor.getX()+ (double) SQUARANTINE_EDGE /2), (anchor.getY()- (double) SQUARANTINE_EDGE /2));
         Point2D point3 = new Point2D.Double((anchor.getX()+ (double) SQUARANTINE_EDGE /2), (anchor.getY()+ (double) SQUARANTINE_EDGE /2));
@@ -107,6 +107,16 @@ public class SquarantineModel implements Movable, Collidable {
         angularAcceleration = torque/momentOfInertia;
         angularVelocity = 0;
     }
+
+//    @Override
+//    public void impact(Point2D normalVector) {
+//
+//
+//        double impactCoefficient = IMPACT_COEFFICIENT;
+//        Point2D impactVector = reflect(normalVector);
+//        impactVector = multiplyVector(impactVector ,impactCoefficient);
+//        this.setDirection(new Direction(normalizeVector(impactVector)));
+//    }
 
     @Override
     public double getImpactCoefficient(Point2D collisionRelativeVector) {

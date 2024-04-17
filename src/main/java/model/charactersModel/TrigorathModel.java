@@ -92,7 +92,7 @@ public class TrigorathModel implements Movable, Collidable {
     }
 
     public void impact(Point2D normalVector, CollisionState collisionState) {
-        System.out.println(normalVector);
+//        System.out.println(normalVector);
         Point2D collisionPoint = collisionState.collisionPoint;
         Point2D collisionRelativeVector = relativeLocation(this.getAnchor(), collisionPoint);
         double impactCoefficient = getImpactCoefficient(collisionRelativeVector);
@@ -107,6 +107,15 @@ public class TrigorathModel implements Movable, Collidable {
         angularAcceleration = torque/momentOfInertia;
         angularVelocity = 0;
     }
+
+//    @Override
+//    public void impact(Point2D normalVector) {
+//        double impactCoefficient = IMPACT_COEFFICIENT;
+//        Point2D impactVector = reflect(normalVector);
+////        System.out.println(normalVector);
+//        impactVector = multiplyVector(impactVector ,impactCoefficient);
+//        this.setDirection(new Direction(normalizeVector(impactVector)));
+//    }
 
     @Override
     public double getImpactCoefficient(Point2D collisionRelativeVector) {

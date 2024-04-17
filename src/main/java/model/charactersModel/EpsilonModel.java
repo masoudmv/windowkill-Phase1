@@ -109,6 +109,11 @@ public class EpsilonModel implements Movable, Collidable {
         }
     }
 
+//    @Override
+//    public void impact(Point2D normalVector) {
+//
+//    }
+
     @Override
     public double getImpactCoefficient(Point2D collisionRelativeVector) {
         double distance = Math.hypot(collisionRelativeVector.getX(), collisionRelativeVector.getY());
