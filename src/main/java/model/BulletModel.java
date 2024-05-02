@@ -1,12 +1,9 @@
 package model;
-import controller.Controller;
 import model.collision.Collidable;
 import model.collision.CollisionState;
 import model.collision.Impactable;
 import model.movement.Direction;
 import model.movement.Movable;
-
-import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.LinkedList;
 import java.util.UUID;
@@ -16,7 +13,6 @@ import static controller.Constants.BULLET_VELOCITY;
 import static controller.Controller.creatBulletView;
 import static controller.Controller.findBulletView;
 import static controller.Utils.*;
-import static controller.Utils.normalizeVector;
 
 public class BulletModel implements Movable, Collidable, Impactable {
     String id;
@@ -25,21 +21,14 @@ public class BulletModel implements Movable, Collidable, Impactable {
     Direction direction;
     public static LinkedList<BulletModel> bulletModels = new LinkedList<>();
 
-
     public BulletModel(Point2D anchor, Direction direction) {
-
         this.radius = BULLET_RADIUS;
-
-
         this.id= UUID.randomUUID().toString();
         this.anchor = anchor;
         this.direction = direction;
-
         bulletModels.add(this);
         movables.add(this);
         collidables.add(this);
-
-
         creatBulletView(id);
     }
 
@@ -62,9 +51,7 @@ public class BulletModel implements Movable, Collidable, Impactable {
     }
 
     @Override
-    public void setDirection(Direction direction) {
-
-    }
+    public void setDirection(Direction direction) {}
 
     @Override
     public void bulletImpact(BulletModel bulletModel, Point2D collisionPoint) {
@@ -74,16 +61,13 @@ public class BulletModel implements Movable, Collidable, Impactable {
 
 
     public void bulletImpact(BulletModel bulletModel, Point2D collisionPoint, Collidable collidable) {
+
         ((Movable) collidable).bulletImpact(bulletModel, collisionPoint);
         for (Movable movable : movables){
             if (movable != this && movable != bulletModel && movable!= collidable){
                 ((Impactable)movable).impact(new CollisionState(collisionPoint));
             }
-        }
-
-
-
-        this.remove();
+        } this.remove();
     }
 
 
@@ -104,13 +88,10 @@ public class BulletModel implements Movable, Collidable, Impactable {
     }
 
     @Override
-    public void friction() {
-
-    }
+    public void friction() {}
 
     @Override
     public Point2D getAnchor() {
-
         return this.anchor;
     }
 
@@ -133,15 +114,10 @@ public class BulletModel implements Movable, Collidable, Impactable {
     }
 
     @Override
-    public void impact(CollisionState collisionState) {
-//        anchor = new Point2D.Double(0,0);
-
-    }
+    public void impact(CollisionState collisionState) {}
 
     @Override
-    public void impact(Point2D normalVector, Point2D collisionPoint, Collidable polygon) {
-
-    }
+    public void impact(Point2D normalVector, Point2D collisionPoint, Collidable polygon) {}
 
 
     @Override
@@ -150,9 +126,7 @@ public class BulletModel implements Movable, Collidable, Impactable {
     }
 
     @Override
-    public void banish() {
-
-    }
+    public void banish() {}
 
     public void remove(){
         collidables.remove(this);

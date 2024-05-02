@@ -1,18 +1,16 @@
 package controller;
 
 import model.BulletModel;
+import model.CollectibleModel;
 import model.charactersModel.EpsilonModel;
 import model.charactersModel.SquarantineModel;
 import model.charactersModel.TrigorathModel;
 import model.movement.Direction;
 import model.movement.Movable;
 import org.example.Main;
-import view.BulletView;
-import view.ShopPanel;
+import view.*;
 import view.charactersView.SquarantineView;
 import view.charactersView.TrigorathView;
-import view.MainFrame;
-import view.MainPanel;
 import view.charactersView.EpsilonView;
 
 import javax.swing.*;
@@ -40,6 +38,7 @@ import static model.charactersModel.TrigorathModel.trigorathModels;
 import static model.collision.Collidable.collidables;
 import static model.movement.Movable.movables;
 import static view.BulletView.bulletViews;
+import static view.CollectibleView.collectibleViews;
 import static view.charactersView.SquarantineView.squarantineViews;
 import static view.charactersView.TrigorathView.trigorathViews;
 
@@ -127,6 +126,8 @@ public class Update implements KeyListener {
 
     public void updateView(){
 
+
+
         elapsedTime += 0.0153846;
 //        System.out.println(elapsedTime);
 
@@ -168,6 +169,9 @@ public class Update implements KeyListener {
             bulletView.setCurrentLocation(calculateViewLocationBullet(MainPanel.getINSTANCE(), bulletView.getId()));
 //            System.out.println(calculateViewLocationBullet(mainPanel.getINSTANCE(), bulletView.getId()));
         }
+        for (CollectibleView collectibleView : collectibleViews){
+            collectibleView.setCurrentLocation(calculateViewLocationCollectible(MainPanel.getINSTANCE(), collectibleView.getId()));
+        }
 
 
         MainFrame.getINSTANCE().repaint();
@@ -180,6 +184,7 @@ public class Update implements KeyListener {
 //        mainPanel.getINSTANCE().panelMotion();
 
         for (SquarantineModel squarantineModel: squarantineModels){
+//            System.out.println(squarantineModel.getDirection().getMagnitude());
             if (squarantineModel.isImpactInProgress()){
                 squarantineModel.getDirection().accelerateDirection(squarantineModel.impactMaxVelocity);
                 if (squarantineModel.getDirection().getMagnitude() > squarantineModel.impactMaxVelocity){
@@ -220,7 +225,7 @@ public class Update implements KeyListener {
         // Check if one second has passed
         if (currentTime - lastUpdateTimeUPS >= 1000) {
             // Print the FPS (which is frameCount since it's been a second)
-//            System.out.println("UPS: " + updateCount);
+            System.out.println("UPS: " + updateCount);
 
             // Reset frame counter and last update time for the next second
             updateCount = 0;
@@ -292,6 +297,10 @@ public class Update implements KeyListener {
                 gameLoop.start();
             }
 
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_T){
+            new CollectibleModel(new Point2D.Double(500, 400));
         }
 
         if (gameLoop.isRunning()) {

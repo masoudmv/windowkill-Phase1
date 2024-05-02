@@ -1,10 +1,12 @@
 package controller;
 
 import model.BulletModel;
+import model.CollectibleModel;
 import model.charactersModel.EpsilonModel;
 import model.charactersModel.SquarantineModel;
 import model.charactersModel.TrigorathModel;
 import view.BulletView;
+import view.CollectibleView;
 import view.charactersView.EpsilonView;
 import view.charactersView.SquarantineView;
 import view.charactersView.TrigorathView;
@@ -14,9 +16,11 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import static controller.Utils.relativeLocation;
+import static model.CollectibleModel.collectibleModels;
 import static model.charactersModel.SquarantineModel.squarantineModels;
 import static model.charactersModel.TrigorathModel.trigorathModels;
 import static view.BulletView.bulletViews;
+import static view.CollectibleView.collectibleViews;
 import static view.charactersView.SquarantineView.squarantineViews;
 import static view.charactersView.TrigorathView.trigorathViews;
 
@@ -29,11 +33,19 @@ public abstract class Controller {
     }
     public static void createTrigorathView(String id){ new TrigorathView(id); }
     public static void creatBulletView(String id){ new BulletView(id); }
+    public static void createCollectibleView(String id){ new CollectibleView(id); }
     public static Point2D calculateViewLocationEpsilon(Component component, String id){
         EpsilonModel epsilonModel = findModel(id);
         Point corner=new Point(component.getX(),component.getY());
         assert epsilonModel != null;
         return relativeLocation(epsilonModel.getAnchor(),corner);
+    }
+
+    public static Point2D calculateViewLocationCollectible(Component component, String id){
+        CollectibleModel collectibleModel = findCollectibleModel(id);
+        Point corner = new Point(component.getX(),component.getY());
+        assert collectibleModel != null;
+        return relativeLocation(collectibleModel.getAnchor(),corner);
     }
 
 
@@ -101,6 +113,20 @@ public abstract class Controller {
     public static BulletModel findBulletModel(String id){
         for (BulletModel bulletModel: BulletModel.bulletModels){
             if (bulletModel.getId().equals(id)) return bulletModel;
+        }
+        return null;
+    }
+
+    public static CollectibleModel findCollectibleModel(String id){
+        for (CollectibleModel collectibleModel: collectibleModels){
+            if (collectibleModel.getId().equals(id)) return collectibleModel;
+        }
+        return null;
+    }
+
+    public static CollectibleView findCollectibleView(String id){
+        for (CollectibleView collectibleView: collectibleViews){
+            if (collectibleView.getId().equals(id)) return collectibleView;
         }
         return null;
     }

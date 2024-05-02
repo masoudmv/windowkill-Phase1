@@ -1,11 +1,14 @@
 package model.collision;
 import model.BulletModel;
+import model.CollectibleModel;
 import view.MainPanel;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+
+import static controller.Game.clip;
 import static controller.Utils.*;
 
 public interface Collidable {
@@ -23,34 +26,36 @@ public interface Collidable {
 
             if (intersection.distance(getAnchor()) <= getRadius()){
                 if (this instanceof BulletModel) {
+                    new Thread(() -> {
+                        //            if (clip != null) {
+                        clip.stop();          // Stop the clip before rewinding it
+                        clip.setFramePosition(0);  // Rewind to the beginning
+                        clip.start();         // Start playing
+                        //            }
+                    }).start();
                     ((BulletModel) this).bulletImpact((BulletModel) this, intersection, collidable);
 
                 }
                 else if (!(collidable instanceof MainPanel) && !(this instanceof MainPanel)) {
-
-//                    System.out.println("enemy!");
-                    // Check for
 
                     double minDistance = Double.MAX_VALUE;
                     for (Point2D vertex: collidable.getVertices()){
                         if (intersection.distance(vertex)<minDistance) minDistance=intersection.distance(vertex);
                     }
 
-
                     if (minDistance<1) System.out.println("Damaged!");
 
-
-
-
-
                     for (Collidable coll : collidables){
-                        if (coll == collidable){
-//                            TODO merge multiple impact methods into one ...
-                            ((Impactable) collidable).impact(relativeLocation(intersection, getAnchor()), intersection, this);
-                        } else if (coll == this){
-                            ((Impactable) this).impact(relativeLocation(getAnchor(), intersection), intersection, collidable);
-                        } else {
-                            ((Impactable) coll).impact(new CollisionState(intersection));
+                        if (!(coll instanceof CollectibleModel)) {
+                            if (coll == collidable){
+    //                            TODO merge multiple impact methods into one ...
+                                ((Impactable) collidable).impact(relativeLocation(intersection, getAnchor()), intersection, this);
+                            } else if (coll == this){
+                                ((Impactable) this).impact(relativeLocation(getAnchor(), intersection), intersection, collidable);
+                            } else {
+                                ((Impactable) coll).impact(new CollisionState(intersection));
+
+                            }
                         }
                     }
                 } else if (collidable instanceof MainPanel) {
@@ -209,12 +214,17 @@ public interface Collidable {
                 }
             }
             for (Collidable coll : collidables){
-                if (coll == poly2){
-                    ((Impactable) poly2).impact(collisionNormalVectorOfPoly2, collisionPointOfPoly2, this);
-                } else if (coll == this){
-                    ((Impactable) this).impact(collisionNormalVectorOfPoly1, collisionPointOfPoly1, poly2);
-                } else {
-                    ((Impactable) coll).impact(new CollisionState(collisionPointOfPoly1));
+                if (!(coll instanceof CollectibleModel)) {
+                    if (coll == poly2){
+                        ((Impactable) poly2).impact(collisionNormalVectorOfPoly2, collisionPointOfPoly2, this);
+                    } else if (coll == this){
+                        ((Impactable) this).impact(collisionNormalVectorOfPoly1, collisionPointOfPoly1, poly2);
+                    } else {
+
+                        ((Impactable) coll).impact(new CollisionState(collisionPointOfPoly1));
+
+
+                    }
                 }
             }
 

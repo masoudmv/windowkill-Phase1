@@ -11,8 +11,12 @@ import model.movement.Movable;
 import view.MainPanel;
 import view.MainFrame;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
+import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
+import java.io.File;
 
 import static controller.Constants.*;
 import static controller.Utils.*;
@@ -34,18 +38,32 @@ public class Game {
     public static SkillTreeAbility skillTreeAbility=null;
     public static boolean empowerIsOn = false;
     public static double empowerEndTime = Double.MAX_VALUE;
+    public static Clip clip;
 
 
 
     public Game (){
+
+        try
+        {
+            clip = AudioSystem.getClip();
+            clip.open(AudioSystem.getAudioInputStream(new File("C:\\Users\\masoo\\Desktop\\Projects\\windowkill_AP\\src\\main\\resources\\burst.wav")));
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace(System.out);
+        }
+
+
+
         INSTANCE = this;
         SwingUtilities.invokeLater(() -> {
             epsilon = new EpsilonModel(new Point2D.Double((double) MainFrame.getINSTANCE().getWidth() /2,(double) MainFrame.getINSTANCE().getHeight() /2));
-//            new SquarantineModel(new Point2D.Double(500,500));
-//            new SquarantineModel(new Point2D.Double(500,700));
-            new TrigorathModel(new Point2D.Double(600,700));
-            new TrigorathModel(new Point2D.Double(700,1000));
-            new TrigorathModel(new Point2D.Double(300,500));
+            new SquarantineModel(new Point2D.Double(500,500));
+            new SquarantineModel(new Point2D.Double(500,700));
+//            new TrigorathModel(new Point2D.Double(600,700));
+//            new TrigorathModel(new Point2D.Double(700,1000));
+//            new TrigorathModel(new Point2D.Double(300,500));
             MainPanel.getINSTANCE();
             new Update();
 
