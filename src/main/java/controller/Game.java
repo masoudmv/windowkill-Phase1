@@ -44,26 +44,29 @@ public class Game {
 
     public Game (){
 
-        try
-        {
-            clip = AudioSystem.getClip();
-            clip.open(AudioSystem.getAudioInputStream(new File("C:\\Users\\masoo\\Desktop\\Projects\\windowkill_AP\\src\\main\\resources\\burst.wav")));
-        }
-        catch (Exception exc)
-        {
-            exc.printStackTrace(System.out);
-        }
+
 
 
 
         INSTANCE = this;
         SwingUtilities.invokeLater(() -> {
+
+//            SoundHandler.loadSound();
+//
+
             epsilon = new EpsilonModel(new Point2D.Double((double) MainFrame.getINSTANCE().getWidth() /2,(double) MainFrame.getINSTANCE().getHeight() /2));
-            new SquarantineModel(new Point2D.Double(500,500));
-            new SquarantineModel(new Point2D.Double(500,700));
+//            new SquarantineModel(new Point2D.Double(500,500));
+//            new SquarantineModel(new Point2D.Double(200,700));
+//            new SquarantineModel(new Point2D.Double(500,300));
+            new SquarantineModel(new Point2D.Double(900,900));
+            new SquarantineModel(new Point2D.Double(800,900));
+
 //            new TrigorathModel(new Point2D.Double(600,700));
 //            new TrigorathModel(new Point2D.Double(700,1000));
 //            new TrigorathModel(new Point2D.Double(300,500));
+//            new TrigorathModel(new Point2D.Double(700,200));
+//            new TrigorathModel(new Point2D.Double(900,900));
+//            new TrigorathModel(new Point2D.Double(1000,1000));
             MainPanel.getINSTANCE();
             new Update();
 
@@ -82,13 +85,8 @@ public class Game {
     public void setPaused(boolean paused) {
         isPaused = paused;
     }
-    public void openShop(){
-
-    }
-    public void closeShop(){
-
-    }
-
+    public void openShop(){}
+    public void closeShop(){}
     public int getXp() {
         return xp;
     }

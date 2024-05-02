@@ -19,7 +19,7 @@ import static controller.Utils.*;
 public class SquarantineModel implements Movable, Collidable, Impactable {
     private int hp = 10;
     String id;
-    double nextDash = 5;
+    double nextDash=Double.MAX_VALUE;
     private Point2D anchor;
     Direction direction;
     Point2D currentLocation;
@@ -42,6 +42,7 @@ public class SquarantineModel implements Movable, Collidable, Impactable {
         vertices = new Point2D[]{point1, point2, point3, point4};
         this.id= UUID.randomUUID().toString();
         this.direction = new Direction(0);
+        updateNextDashTime();
         squarantineModels.add(this);
         collidables.add(this);
         movables.add(this);
@@ -115,12 +116,17 @@ public class SquarantineModel implements Movable, Collidable, Impactable {
 
     public void bulletImpact(BulletModel bulletModel, Point2D collisionPoint){
         Point2D impactVector = bulletModel.getDirection().getDirectionVector();
-        impactMaxVelocity = 2 * BULLET_IMPACT_COEFFICIENT / 5;
-
+        impactMaxVelocity = 2 * IMPACT_COEFFICIENT / 5;
         setImpactInProgress(true);
-
         this.setDirection(new Direction(normalizeVector(impactVector)));
 
+    }
+    private void updateNextDashTime(){
+        Random random = new Random();
+        nextDash = Math.abs(random.nextGaussian(0.5, 0.5));
+        if (nextDash<0.25) nextDash=0.25;
+        if (nextDash>0.75) nextDash=0.75;
+        nextDash *=4;
     }
 
 
@@ -186,13 +192,9 @@ public class SquarantineModel implements Movable, Collidable, Impactable {
         Random random = new Random();
         Point2D dir = normalizeVector(relativeLocation(EpsilonModel.getINSTANCE().getAnchor(), getAnchor()));
         double angle = findAngleBetweenTwoVectors(dir, getDirection().getDirectionVector());
-//        System.out.println(nextDash);
         nextDash -= 0.010;
         if (nextDash<=0 && !impactInProgress && angle<1){
-            nextDash = Math.abs(random.nextGaussian(0.5, 0.5));
-            if (nextDash<0.25) nextDash=0.25;
-            if (nextDash>0.75) nextDash=0.75;
-            nextDash *=4;
+            updateNextDashTime();
             impactMaxVelocity = 2 * IMPACT_COEFFICIENT / 5;
             setImpactInProgress(true);
         }

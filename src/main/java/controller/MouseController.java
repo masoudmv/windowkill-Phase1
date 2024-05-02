@@ -6,15 +6,23 @@ import model.movement.Direction;
 import view.MainFrame;
 import view.MainPanel;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Time;
 import java.util.Timer;
 
 import static controller.Constants.BULLET_VELOCITY;
 import static controller.Game.*;
+import static controller.SoundHandler.doPlay;
+//import static controller.SoundHandler.playSound;
 
 public class MouseController implements MouseListener {
     private EpsilonModel epsilon;
@@ -60,13 +68,15 @@ public class MouseController implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-//        EpsilonModel.getINSTANCE().addVertex();
-//        System.out.println("pressed");
+//        Sound sound = new Sound("C:\\Users\\masoo\\Desktop\\Projects\\windowkill_AP\\src\\main\\resources\\burst2.wav");
+//        sound.play();
+
 
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
+//        playSound();
 
     }
 

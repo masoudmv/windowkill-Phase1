@@ -111,14 +111,14 @@ public class EpsilonModel implements Movable, Collidable, Impactable {
 
     @Override
     public void impact(CollisionState collisionState) {
-//        Point2D collisionPoint = collisionState.collisionPoint;
-//        Point2D collisionRelativeVector = relativeLocation(this.getAnchor(), collisionPoint);
-//        double impactCoefficient = getImpactCoefficient(collisionRelativeVector);
-//        Point2D impactVector = normalizeVector(collisionRelativeVector);
-//        impactVector = multiplyVector(impactVector ,impactCoefficient);
-//        Point2D r2 = addVectors(this.getDirection().getNormalizedDirectionVector(), impactVector);
-//        Direction direction = new Direction((r2));
-//        if (impactCoefficient != 0) this.setDirection(direction);
+        Point2D collisionPoint = collisionState.collisionPoint;
+        Point2D collisionRelativeVector = relativeLocation(this.getAnchor(), collisionPoint);
+        double impactCoefficient = getImpactCoefficient(collisionRelativeVector);
+        Point2D impactVector = normalizeVector(collisionRelativeVector);
+        impactVector = multiplyVector(impactVector ,impactCoefficient);
+        Point2D r2 = addVectors(this.getDirection().getNormalizedDirectionVector(), impactVector);
+        Direction direction = new Direction((r2));
+        if (impactCoefficient != 0) this.setDirection(direction);
     }
 
 
@@ -127,16 +127,12 @@ public class EpsilonModel implements Movable, Collidable, Impactable {
         double impactCoefficient = getImpactCoefficient(normalVector);
         Point2D impactVector = reflect(relativeLocation(getAnchor(), collisionPoint));
         impactVector = multiplyVector(impactVector ,impactCoefficient);
-
-
         if (this.getDirection().getMagnitude() < 2){
             setDirection(new Direction(normalizeVector(relativeLocation(getAnchor(), collisionPoint))));
         }
         else {
             setDirection(new Direction(normalizeVector(impactVector)));
         }
-
-
     }
 
     @Override
@@ -245,5 +241,7 @@ public class EpsilonModel implements Movable, Collidable, Impactable {
     public int getHp() {
         return hp;
     }
+
+
 
 }

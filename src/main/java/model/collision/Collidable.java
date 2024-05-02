@@ -1,4 +1,5 @@
 package model.collision;
+import controller.Sound;
 import model.BulletModel;
 import model.CollectibleModel;
 import view.MainPanel;
@@ -9,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static controller.Game.clip;
+import static controller.SoundHandler.doPlay;
+//import static controller.SoundHandler.playSound;
 import static controller.Utils.*;
 
 public interface Collidable {
@@ -26,14 +29,23 @@ public interface Collidable {
 
             if (intersection.distance(getAnchor()) <= getRadius()){
                 if (this instanceof BulletModel) {
-                    new Thread(() -> {
-                        //            if (clip != null) {
-                        clip.stop();          // Stop the clip before rewinding it
-                        clip.setFramePosition(0);  // Rewind to the beginning
-                        clip.start();         // Start playing
-                        //            }
-                    }).start();
+//                    new Thread(() -> {
+//                        //            if (clip != null) {
+//                        clip.stop();          // Stop the clip before rewinding it
+//                        clip.setFramePosition(0);  // Rewind to the beginning
+//                        clip.start();         // Start playing
+//                                    }
+//                    }).start();
+
+//                    new Thread(() -> {
+
+//                    }).start();
+
+
+                    Sound sound = new Sound("C:\\Users\\masoo\\Desktop\\Projects\\windowkill_AP\\src\\main\\resources\\burst2.wav");
+                    sound.play();
                     ((BulletModel) this).bulletImpact((BulletModel) this, intersection, collidable);
+
 
                 }
                 else if (!(collidable instanceof MainPanel) && !(this instanceof MainPanel)) {
@@ -45,10 +57,10 @@ public interface Collidable {
 
                     if (minDistance<1) System.out.println("Damaged!");
 
+
                     for (Collidable coll : collidables){
                         if (!(coll instanceof CollectibleModel)) {
                             if (coll == collidable){
-    //                            TODO merge multiple impact methods into one ...
                                 ((Impactable) collidable).impact(relativeLocation(intersection, getAnchor()), intersection, this);
                             } else if (coll == this){
                                 ((Impactable) this).impact(relativeLocation(getAnchor(), intersection), intersection, collidable);

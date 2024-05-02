@@ -1,5 +1,6 @@
 package controller;
 
+import com.sun.source.tree.IfTree;
 import model.BulletModel;
 import model.CollectibleModel;
 import model.charactersModel.EpsilonModel;
@@ -31,8 +32,7 @@ import static controller.Game.*;
 import static controller.Game.ShopAbility.*;
 import static controller.Game.SkillTreeAbility.*;
 import static controller.MouseController.*;
-import static controller.Utils.addVectors;
-import static controller.Utils.multiplyVector;
+import static controller.Utils.*;
 import static model.charactersModel.SquarantineModel.squarantineModels;
 import static model.charactersModel.TrigorathModel.trigorathModels;
 import static model.collision.Collidable.collidables;
@@ -43,6 +43,8 @@ import static view.charactersView.SquarantineView.squarantineViews;
 import static view.charactersView.TrigorathView.trigorathViews;
 
 public class Update implements KeyListener {
+    private long lastTickTime = System.currentTimeMillis();
+
     // Add FPS tracking variables
     private long lastUpdateTime = System.currentTimeMillis();
     private int frameCount = 0;
@@ -75,6 +77,29 @@ public class Update implements KeyListener {
 
 
     }
+
+//    @Override
+//    public void run() {
+//        long startTime, elapsedTime, waitTime;
+//
+//        while (running) {
+//            startTime = System.nanoTime();
+//
+//            updateModel();
+//            updateView();
+//
+//            elapsedTime = System.nanoTime() - startTime;
+//            waitTime = targetTime - elapsedTime / 1000000;
+//
+//            if (waitTime < 0) waitTime = 5; // Ensure some delay to prevent the loop from spinning too fast.
+//
+//            try {
+//                Thread.sleep(waitTime);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
 
     private void startMovementTimer() {
@@ -125,13 +150,18 @@ public class Update implements KeyListener {
     }
 
     public void updateView(){
+        long currentTickTime = System.currentTimeMillis();
+        long interval = currentTickTime - lastTickTime;
+        System.out.println("Interval between updates: " + interval + " ms");
+        lastTickTime = currentTickTime;
 
 
 
         elapsedTime += 0.0153846;
 //        System.out.println(elapsedTime);
 
-        updateMovement();
+        if (!EpsilonModel.getINSTANCE().isImpactInProgress()) updateMovement();
+//        System.out.println(EpsilonModel.getINSTANCE().isImpactInProgress());
 
         updateModel();
         // Increment frame count every time updateView is called
@@ -249,6 +279,7 @@ public class Update implements KeyListener {
 
 
 
+
         if (elapsedTime > empowerEndTime){
             empowerIsOn=false;
             extraBullet =0;
@@ -257,6 +288,7 @@ public class Update implements KeyListener {
         if (empowerIsOn && tripleShot && mousePosition!=null && extraBullet<2){
             if (elapsedTime-lastShot>0.05){
                 new BulletModel(EpsilonModel.getINSTANCE().getAnchor(), lastBullet.getDirection());
+//                SoundHandler.playClip();
                 extraBullet++;
                 lastShot=elapsedTime;
             }
@@ -266,9 +298,6 @@ public class Update implements KeyListener {
             extraBullet =0;
             tripleShot=false;
         }
-
-
-
     }
 
 
@@ -277,6 +306,27 @@ public class Update implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+
+//        if (EpsilonModel.getINSTANCE().getDirection().getMagnitude() == 1){
+//            EpsilonModel epsilon = EpsilonModel.getINSTANCE();
+//            Point2D movement = new Point2D.Double(0, 0);
+//            if (e.getKeyCode() == KeyEvent.VK_W){
+//                movement = new Point2D.Double(0,-1);
+//            } if (e.getKeyCode() == KeyEvent.VK_D){
+//                movement = new Point2D.Double(1,0);
+//            } if (e.getKeyCode() == KeyEvent.VK_S){
+//                movement = new Point2D.Double(0, 1);
+//            } if (e.getKeyCode() == KeyEvent.VK_A){
+//                movement = new Point2D.Double(-1,0);
+//            }
+//            Point2D currentDirection = epsilon.getDirection().getNormalizedDirectionVector();
+//            Point2D newDirection = addVectors(currentDirection, movement);
+//            epsilon.setDirection(new Direction(newDirection));
+//            epsilon.getDirection().adjustDirectionMagnitude();
+//        }
+
+
+
 
         if (e.getKeyCode() == KeyEvent.VK_R){
 

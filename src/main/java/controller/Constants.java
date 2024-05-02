@@ -23,7 +23,7 @@ public class Constants {
     public static final double IMPACT_COEFFICIENT = 6;
     public static final double BULLET_IMPACT_COEFFICIENT = 5;
     public static final double SMALL_IMPACT_RADIUS = 100;
-    public static final double LARGE_IMPACT_RADIUS = 400;
+    public static final double LARGE_IMPACT_RADIUS = 300;
     public static final double PI = Math.PI;
     public static final double BULLET_RADIUS = 5;
     public static final double BULLET_VELOCITY = 10;
