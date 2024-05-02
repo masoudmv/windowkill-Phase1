@@ -6,13 +6,18 @@ import javax.swing.*;
 import java.awt.*;
 
 import static controller.Constants.FRAME_DIMENSION;
-import static controller.Constants.PANEL_SIZE;
+//import static controller.Constants.PANEL_SIZE;
 
-public final class myFrame extends JFrame {
-    private static myFrame INSTANCE;
-    private myFrame() throws HeadlessException {
+public final class MainFrame extends JFrame {
+    private static MainFrame INSTANCE;
+    private MainFrame() throws HeadlessException {
         setUndecorated(true);
         setBackground(new Color(0,0,0,0));
+
+//        getContentPane().setBackground(Color.black);
+
+//        setBackground(Color.yellow);
+
 //        addKeyListener(KeyController);
 //        setBackground(Color.BLACK);
         setSize(FRAME_DIMENSION);
@@ -21,8 +26,8 @@ public final class myFrame extends JFrame {
         setLayout(null);
     }
 
-    public static myFrame getINSTANCE() {
-        if (INSTANCE==null) INSTANCE=new myFrame();
+    public static MainFrame getINSTANCE() {
+        if (INSTANCE==null) INSTANCE=new MainFrame();
         return INSTANCE;
     }
 }

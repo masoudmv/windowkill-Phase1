@@ -1,5 +1,6 @@
 package model.movement;
 
+import model.BulletModel;
 import model.collision.Collidable;
 import model.collision.CollisionState;
 
@@ -16,6 +17,8 @@ public interface Movable {
     boolean isCircular();
     LinkedList<Movable> movables = new LinkedList<>();
     void setDirection(Direction direction);
+    void bulletImpact(BulletModel bulletModel, Point2D collisionPoint);
+
     Direction getDirection();
     void move(Direction direction);
     void move();

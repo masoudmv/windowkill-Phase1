@@ -2,6 +2,7 @@ package view.charactersView;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 
 import static controller.Constants.RADIUS;
@@ -10,6 +11,7 @@ public class EpsilonView implements Drawable{
     String id;
     Point2D currentLocation=new Point2D.Double(0,0);
     public static ArrayList<EpsilonView> epsilonViews=new ArrayList<>();
+    private  ArrayList<Point2D> vertices = new ArrayList<>();
     public EpsilonView(String id) {
         this.id = id;
         epsilonViews.add(this);
@@ -18,6 +20,9 @@ public class EpsilonView implements Drawable{
 
     public Point2D getCurrentLocation() {
         return currentLocation;
+    }
+    public void setVertices(ArrayList<Point2D> vertices){
+        this.vertices = vertices;
     }
 
     public void setCurrentLocation(Point2D currentLocation) {
@@ -29,9 +34,13 @@ public class EpsilonView implements Drawable{
     }
     @Override
     public void draw (Graphics g){
-        g.setColor(Color.BLACK);
+        g.setColor(Color.white);
         Point2D location = this.getCurrentLocation();
         g.fillOval((int) (location.getX()-RADIUS), (int) (location.getY()-RADIUS), (int) (2 *RADIUS), (int) (2*RADIUS));
+        for (int i = 0; i < vertices.size(); i++) {
+            g.setColor(Color.BLUE);
+            g.fillOval((int) vertices.get(i).getX(), (int) vertices.get(i).getY(), 5, 5 );
+        }
     }
 
 }

@@ -33,11 +33,16 @@ public class TrigorathView implements Drawable{
         return id;
     }
 
+    public void remove(){
+        drawables.remove(this);
+        trigorathViews.remove(this);
+    }
+
     @Override
     public void draw(Graphics g) {
         int[] xPoly = new int[]{(int) vertices[0].getX(), (int) vertices[1].getX(), (int) vertices[2].getX()};
         int[] yPoly = new int[]{(int) vertices[0].getY(), (int) vertices[1].getY(), (int) vertices[2].getY()};
-        g.setColor(Color.black);
+        g.setColor(Color.white);
         Polygon poly = new Polygon(xPoly, yPoly, xPoly.length);
         g.fillPolygon(poly);
     }

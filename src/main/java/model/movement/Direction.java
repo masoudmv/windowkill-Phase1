@@ -5,6 +5,7 @@ import java.awt.geom.Point2D;
 
 import static controller.Constants.EPSILON_MAX_SPEED;
 import static controller.Constants.SPEED;
+import static controller.Utils.multiplyVector;
 
 public class Direction {
     public boolean isUpward = false;
@@ -31,7 +32,7 @@ public class Direction {
         double x=Math.cos(Math.toRadians(angle));
         double y=Math.sin(Math.toRadians(angle));
         this.slope=y/x;
-//        TODO ...?
+
         if ((angle>=0 && angle<180)) state=DirectionState.positive;
         else state=DirectionState.negative;
     }
@@ -46,6 +47,18 @@ public class Direction {
         return normalVector;
     }
 
+    public Point2D getTrigorathNormalizedDirectionVector(){
+        if (state==DirectionState.neutral) return new Point(0,0);
+        if (isUpward) return new Point2D.Double(0,1);
+        if (isDownward) return new Point2D.Double(0,-1);
+        double magnitude=Math.sqrt(1+slope*slope);
+        Point2D.Double normalVector=new Point2D.Double(1/magnitude,slope/magnitude);
+        if (state==DirectionState.negative) normalVector=new Point2D.Double(-normalVector.x,-normalVector.y);
+        return multiplyVector(normalVector, 1.5);
+    }
+
+
+
     public Point2D getDirectionVector(){
         if (state==DirectionState.neutral) return new Point(0,0);
         if (isUpward) return new Point2D.Double(0,magnitude);
@@ -59,7 +72,14 @@ public class Direction {
     public void accelerateDirection(double speed){
 //        magnitude *= 1.2;
         if (magnitude < speed){
-            magnitude *= 1.2;
+            magnitude *= 1.15;
+        }
+    }
+
+    public void decelerateDirection(double speed){
+//        magnitude *= 1.2;
+        if (magnitude > speed){
+            magnitude = magnitude / 0.8;
         }
     }
 
@@ -68,6 +88,9 @@ public class Direction {
 
     public void adjustDirectionMagnitude(){
         if (magnitude >SPEED) this.magnitude = SPEED;
+    }
+    public void adjustTrigorathDirectionMagnitude(){
+        if (magnitude > 1.5) this.magnitude = 1.5;
     }
     public void adjustEpsilonDirectionMagnitude(){
         if (magnitude >EPSILON_MAX_SPEED) this.magnitude = EPSILON_MAX_SPEED;

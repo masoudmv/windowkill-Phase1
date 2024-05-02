@@ -1,48 +1,51 @@
 package model.charactersModel;
 
+import model.BulletModel;
 import model.collision.Collidable;
 import model.collision.CollisionState;
+import model.collision.Impactable;
 import model.movement.Direction;
 import model.movement.Movable;
 
-import javax.swing.plaf.IconUIResource;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.UUID;
 
 import static controller.Constants.*;
-import static controller.Controller.createSquarantineView;
+import static controller.Controller.*;
 import static controller.Utils.*;
 
-public class SquarantineModel implements Movable, Collidable {
-    private Point2D anchor;
-    Point2D currentLocation;
-    public double impactMaxVelocity;
-    double radius;
+public class SquarantineModel implements Movable, Collidable, Impactable {
+    private int hp = 10;
     String id;
+    double nextDash = 5;
+    private Point2D anchor;
     Direction direction;
-    private boolean impactInProgress = false;
+    Point2D currentLocation;
     private final Point2D[] vertices;
-    public static ArrayList<SquarantineModel> squarantineModels =new ArrayList<>();
-
+    double radius;
+    private boolean impactInProgress = false;
+    public double impactMaxVelocity;
     private double angle;
     private double angularVelocity;
     private double angularAcceleration;
-
+    public static ArrayList<SquarantineModel> squarantineModels =new ArrayList<>();
 
     public SquarantineModel(Point2D anchor) {
         this.anchor = anchor;
-        this.radius = (double) SQUARANTINE_EDGE /2;
-        Point2D point1 = new Point2D.Double((anchor.getX()- (double) SQUARANTINE_EDGE /2), (anchor.getY()- (double) SQUARANTINE_EDGE /2));
-        Point2D point2 = new Point2D.Double((anchor.getX()+ (double) SQUARANTINE_EDGE /2), (anchor.getY()- (double) SQUARANTINE_EDGE /2));
-        Point2D point3 = new Point2D.Double((anchor.getX()+ (double) SQUARANTINE_EDGE /2), (anchor.getY()+ (double) SQUARANTINE_EDGE /2));
-        Point2D point4 = new Point2D.Double((anchor.getX()- (double) SQUARANTINE_EDGE /2), (anchor.getY()+ (double) SQUARANTINE_EDGE /2));
+        this.radius =SQUARANTINE_EDGE /2;
+        Point2D point1 = new Point2D.Double((anchor.getX()-SQUARANTINE_EDGE /2), (anchor.getY()-SQUARANTINE_EDGE /2));
+        Point2D point2 = new Point2D.Double((anchor.getX()+SQUARANTINE_EDGE /2), (anchor.getY()-SQUARANTINE_EDGE /2));
+        Point2D point3 = new Point2D.Double((anchor.getX()+SQUARANTINE_EDGE /2), (anchor.getY()+SQUARANTINE_EDGE /2));
+        Point2D point4 = new Point2D.Double((anchor.getX()-SQUARANTINE_EDGE /2), (anchor.getY()+SQUARANTINE_EDGE /2));
         vertices = new Point2D[]{point1, point2, point3, point4};
         this.id= UUID.randomUUID().toString();
         this.direction = new Direction(0);
         squarantineModels.add(this);
         collidables.add(this);
         movables.add(this);
+        impactables.add(this);
         createSquarantineView(id);
     }
 
@@ -79,8 +82,89 @@ public class SquarantineModel implements Movable, Collidable {
         Point2D collisionPoint = collisionState.collisionPoint;
         Point2D collisionRelativeVector = relativeLocation(this.getAnchor(), collisionPoint);
         double impactCoefficient = getImpactCoefficient(collisionRelativeVector);
+//        impactCoefficient *= 2;
         Point2D impactVector = normalizeVector(relativeLocation(this.getAnchor(), collisionState.collisionPoint));
         impactVector = multiplyVector(impactVector ,impactCoefficient);
+        Point2D r2 = addVectors(this.getDirection().getNormalizedDirectionVector(), impactVector);
+        Direction direction = new Direction(normalizeVector(r2));
+        this.setDirection(direction);
+
+    }
+
+
+    @Override
+    public void impact(Point2D normalVector, Point2D collisionPoint, Collidable polygon) {
+        Point2D collisionRelativeVector = relativeLocation(this.getAnchor(), collisionPoint);
+        double impactCoefficient = getImpactCoefficient(collisionRelativeVector);
+        Point2D impactVector = relativeLocation(collisionPoint, polygon.getAnchor());
+        if(!(polygon instanceof  EpsilonModel)) impactVector = multiplyVector(normalizeVector(impactVector) ,1);
+        impactVector = addVectors(impactVector, getDirection().getNormalizedDirectionVector());
+        impactVector = multiplyVector(impactVector ,impactCoefficient);
+        this.setDirection(new Direction(normalizeVector(impactVector)));
+
+        // Angular motion
+        Point2D r = relativeLocation(collisionPoint, this.getAnchor());
+        Point2D f = relativeLocation(collisionPoint, polygon.getAnchor());
+        double torque = -r.getX()*f.getY()+r.getY()*f.getX();
+        if (torque>400) torque = 400;
+        if (torque<-400) torque = -400;
+        double momentOfInertia = calculateSquarantineInertia();
+        angularAcceleration = torque/momentOfInertia;
+        angularVelocity = 0;
+    }
+
+    public void bulletImpact(BulletModel bulletModel, Point2D collisionPoint){
+        Point2D impactVector = bulletModel.getDirection().getDirectionVector();
+        impactMaxVelocity = 2 * BULLET_IMPACT_COEFFICIENT / 5;
+
+        setImpactInProgress(true);
+
+        this.setDirection(new Direction(normalizeVector(impactVector)));
+
+    }
+
+
+    @Override
+    public double getImpactCoefficient(Point2D collisionRelativeVector) {
+        double distance = Math.hypot(collisionRelativeVector.getX(), collisionRelativeVector.getY());
+        double impactCoefficient;
+        if (distance < SMALL_IMPACT_RADIUS) {
+            setImpactInProgress(true);
+            impactMaxVelocity = 2 * IMPACT_COEFFICIENT / 5;
+            impactCoefficient = IMPACT_COEFFICIENT;
+        } else if (distance > (LARGE_IMPACT_RADIUS + SMALL_IMPACT_RADIUS - 50) /2) {
+            setImpactInProgress(false);
+            impactCoefficient = 0;
+        } else {
+            setImpactInProgress(true);
+            double coefficient = 1 - (distance- SMALL_IMPACT_RADIUS-50)/(LARGE_IMPACT_RADIUS - SMALL_IMPACT_RADIUS);
+            impactCoefficient = coefficient * IMPACT_COEFFICIENT;
+            impactMaxVelocity = 2 * coefficient * IMPACT_COEFFICIENT / 5;
+        }
+        return impactCoefficient;
+    }
+
+    @Override
+    public void banish() {
+        Point2D collisionPoint = EpsilonModel.getINSTANCE().getAnchor();
+        Point2D collisionRelativeVector = relativeLocation(this.getAnchor(), collisionPoint);
+        double distance = Math.hypot(collisionRelativeVector.getX(), collisionRelativeVector.getY());
+        double impactCoefficient;
+        if (distance < 100) {
+            setImpactInProgress(true);
+            impactMaxVelocity = 2.4 * IMPACT_COEFFICIENT / 5;
+            impactCoefficient = IMPACT_COEFFICIENT;
+        } else if (distance > 225) {
+            setImpactInProgress(false);
+            impactCoefficient = 0;
+        } else {
+            setImpactInProgress(true);
+            double coefficient = 1 - (distance- 100)/(500 - 100);
+            impactCoefficient = coefficient * IMPACT_COEFFICIENT;
+            impactMaxVelocity = 2.4 * coefficient * impactCoefficient / 5;
+        }
+        Point2D impactVector = normalizeVector(relativeLocation(this.getAnchor(), collisionPoint));
+        impactVector = multiplyVector(impactVector, impactCoefficient);
         Point2D r2 = addVectors(this.getDirection().getNormalizedDirectionVector(), impactVector);
         if(!isCircular()){
             Direction direction = new Direction(normalizeVector(r2));
@@ -91,53 +175,6 @@ public class SquarantineModel implements Movable, Collidable {
         }
     }
 
-    public void impact(Point2D normalVector, CollisionState collisionState) {
-        Point2D collisionPoint = collisionState.collisionPoint;
-        Point2D collisionRelativeVector = relativeLocation(this.getAnchor(), collisionPoint);
-        double impactCoefficient = getImpactCoefficient(collisionRelativeVector);
-        Point2D impactVector = reflect(normalVector);
-        impactVector = multiplyVector(impactVector ,impactCoefficient);
-        this.setDirection(new Direction(normalizeVector(impactVector)));
-        // Angular motion
-        Point2D r = relativeLocation(collisionPoint, anchor);
-        Point2D f = normalVector;
-        double torque = -r.getX()*f.getY()+r.getY()*f.getX();
-//        System.out.println(torque);
-        double momentOfInertia = calculateSquarantineInertia();
-        angularAcceleration = torque/momentOfInertia;
-        angularVelocity = 0;
-    }
-
-//    @Override
-//    public void impact(Point2D normalVector) {
-//
-//
-//        double impactCoefficient = IMPACT_COEFFICIENT;
-//        Point2D impactVector = reflect(normalVector);
-//        impactVector = multiplyVector(impactVector ,impactCoefficient);
-//        this.setDirection(new Direction(normalizeVector(impactVector)));
-//    }
-
-    @Override
-    public double getImpactCoefficient(Point2D collisionRelativeVector) {
-        double distance = Math.hypot(collisionRelativeVector.getX(), collisionRelativeVector.getY());
-        double impactCoefficient;
-        if (distance < SMALL_IMPACT_RADIUS) {
-            setImpactInProgress(true);
-            impactMaxVelocity = 2 * IMPACT_COEFFICIENT / 5;
-            impactCoefficient = IMPACT_COEFFICIENT;
-        } else if (distance > (LARGE_IMPACT_RADIUS + SMALL_IMPACT_RADIUS) /2) {
-            setImpactInProgress(false);
-            impactCoefficient = 0;
-        } else {
-            setImpactInProgress(true);
-            double coefficient = 1 - (distance- SMALL_IMPACT_RADIUS)/(LARGE_IMPACT_RADIUS - SMALL_IMPACT_RADIUS);
-            impactCoefficient = coefficient * IMPACT_COEFFICIENT;
-            impactMaxVelocity = 2 * coefficient * IMPACT_COEFFICIENT / 5;
-        }
-        return impactCoefficient;
-    }
-
     @Override
     public Point2D[] getVertices() {
         return this.vertices;
@@ -146,6 +183,19 @@ public class SquarantineModel implements Movable, Collidable {
     @Override
     public void move(Direction direction) {
         Point2D movement = multiplyVector(direction.getDirectionVector(), direction.getMagnitude());
+        Random random = new Random();
+        Point2D dir = normalizeVector(relativeLocation(EpsilonModel.getINSTANCE().getAnchor(), getAnchor()));
+        double angle = findAngleBetweenTwoVectors(dir, getDirection().getDirectionVector());
+//        System.out.println(nextDash);
+        nextDash -= 0.010;
+        if (nextDash<=0 && !impactInProgress && angle<1){
+            nextDash = Math.abs(random.nextGaussian(0.5, 0.5));
+            if (nextDash<0.25) nextDash=0.25;
+            if (nextDash>0.75) nextDash=0.75;
+            nextDash *=4;
+            impactMaxVelocity = 2 * IMPACT_COEFFICIENT / 5;
+            setImpactInProgress(true);
+        }
         this.anchor = addVectors(anchor, movement);
         for (int i = 0; i < 4; i++) {
             vertices[i] = addVectors(vertices[i], movement);
@@ -160,6 +210,11 @@ public class SquarantineModel implements Movable, Collidable {
     @Override
     public boolean isCircular() {
         return false;
+    }
+
+    @Override
+    public double getRadius() {
+        return 0;
     }
 
     public Point2D getCurrentLocation() {
@@ -183,24 +238,16 @@ public class SquarantineModel implements Movable, Collidable {
         this.angle = angle;
     }
     public void rotate(){
-//        System.out.println(angularVelocity);
-//        angularVelocity *= 0.99;
-//        if (Math.abs(angularVelocity) < 0.001) {
-//            angularVelocity = 0;
-//        }
         if (Math.abs(angularVelocity) < 0.0001 && angularAcceleration ==0){
             angularVelocity = 0;
         }
 
         // Angular Friction
         if (angularVelocity<0 && angularAcceleration==0){
-            angularVelocity += 0.0005;
+            angularVelocity += 0.0004;
         } else if (angularVelocity>0 && angularAcceleration==0) {
-            angularVelocity -= 0.0005;
+            angularVelocity -= 0.0004;
         }
-
-
-
         if (Math.abs(angularVelocity) < Math.abs(angularAcceleration*10)) {
             angularVelocity += angularAcceleration;
         }
@@ -241,4 +288,18 @@ public class SquarantineModel implements Movable, Collidable {
 
     }
 
+    public void remove(){
+        collidables.remove(this);
+        movables.remove(this);
+        squarantineModels.remove(this);
+        findSquarantineView(id).remove();
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public void setHp(int hp) {
+        this.hp = hp;
+    }
 }

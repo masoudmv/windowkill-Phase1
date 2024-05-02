@@ -1,10 +1,12 @@
 package model.charactersModel;
 
+import model.BulletModel;
 import model.collision.Collidable;
 import model.collision.CollisionState;
+import model.collision.Impactable;
 import model.movement.Direction;
 import model.movement.Movable;
-import view.myFrame;
+import view.MainFrame;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -16,16 +18,22 @@ import static controller.Controller.createEpsilonView;
 import static controller.Utils.*;
 import static controller.Utils.normalizeVector;
 
-public class EpsilonModel implements Movable, Collidable {
+public class EpsilonModel implements Movable, Collidable, Impactable {
     private static EpsilonModel INSTANCE;
+    private int hp = 100;
     Point2D anchor;
     double radius;
     private boolean impactInProgress = false;
     String id;
     Direction direction;
-    public static ArrayList<EpsilonModel> epsilonModels=new ArrayList<>();
+    public static ArrayList<EpsilonModel> epsilonModels = new ArrayList<>();
+
+    public int numberOfVertices = 0;
+
+    public ArrayList<Point2D> vertices = new ArrayList<>();
 
     public EpsilonModel(Point2D anchor) {
+        INSTANCE = this;
         this.anchor = anchor;
         this.radius = RADIUS;
 
@@ -36,13 +44,14 @@ public class EpsilonModel implements Movable, Collidable {
         epsilonModels.add(this);
         collidables.add(this);
         movables.add(this);
+//        impactables.add(this);
         createEpsilonView(id);
-        INSTANCE = this;
+
     }
 
     public static EpsilonModel getINSTANCE() {
         if (INSTANCE == null) INSTANCE = new EpsilonModel(
-                new Point2D.Double((double) myFrame.getINSTANCE().getWidth() /2,(double) myFrame.getINSTANCE().getHeight() /2));
+                new Point2D.Double((double) MainFrame.getINSTANCE().getWidth() /2,(double) MainFrame.getINSTANCE().getHeight() /2));
         return INSTANCE;
     }
 
@@ -66,57 +75,15 @@ public class EpsilonModel implements Movable, Collidable {
     }
 
     @Override
-    public Direction getDirection() {
-        return direction;
+    public void bulletImpact(BulletModel bulletModel, Point2D collisionPoint){
+//        Point2D dist = relativeLocation(getAnchor(), collisionPoint);aaaaw;
+
     }
 
-    @Override
-    public Point2D getAnchor() {
-        return anchor;
-    }
 
-    @Override
-    public void impact(CollisionState collisionState) {
-        Point2D collisionPoint = collisionState.collisionPoint;
-        Point2D collisionRelativeVector = relativeLocation(this.getAnchor(), collisionPoint);
-        double impactCoefficient = getImpactCoefficient(collisionRelativeVector);
-        Point2D impactVector = normalizeVector(relativeLocation(this.getAnchor(), collisionState.collisionPoint));
-        impactVector = multiplyVector(impactVector ,impactCoefficient);
-//        System.out.println(impactVector);
-        Point2D r2 = addVectors(this.getDirection().getNormalizedDirectionVector(), impactVector);
-        if(!isCircular()){
-            Direction direction = new Direction(normalizeVector(r2));
-            this.setDirection(direction);
-        } else {
-//           Direction direction = new Direction(r2);
-//            this.setDirection(direction);
-            Direction direction = new Direction(normalizeVector(r2));
-            this.setDirection(direction);
-        }
-    }
-
-    public void impact(Point2D normalVector, CollisionState collisionState) {
-        Point2D collisionPoint = collisionState.collisionPoint;
-        Point2D collisionRelativeVector = relativeLocation(this.getAnchor(), collisionPoint);
-        double impactCoefficient = getImpactCoefficient(collisionRelativeVector);
-        Point2D impactVector = reflect(normalVector);
-        impactVector = multiplyVector(impactVector ,impactCoefficient);
-        if (this.getDirection().getMagnitude() < 2){
-            setDirection(new Direction(normalizeVector(relativeLocation(getAnchor(), collisionPoint))));
-        }
-        else {
-            setDirection(new Direction(normalizeVector(impactVector)));
-        }
-    }
-
-//    @Override
-//    public void impact(Point2D normalVector) {
-//
-//    }
-
-    @Override
-    public double getImpactCoefficient(Point2D collisionRelativeVector) {
-        double distance = Math.hypot(collisionRelativeVector.getX(), collisionRelativeVector.getY());
+    //    @Override
+    public double getImpactCoefficient(double distance) {
+//        double distance = Math.hypot(collisionRelativeVector.getX(), collisionRelativeVector.getY());
         double impactCoefficient;
         if (distance < SMALL_IMPACT_RADIUS) {
             setImpactInProgress(true);
@@ -133,7 +100,72 @@ public class EpsilonModel implements Movable, Collidable {
     }
 
     @Override
+    public Direction getDirection() {
+        return direction;
+    }
+
+    @Override
+    public Point2D getAnchor() {
+        return anchor;
+    }
+
+    @Override
+    public void impact(CollisionState collisionState) {
+//        Point2D collisionPoint = collisionState.collisionPoint;
+//        Point2D collisionRelativeVector = relativeLocation(this.getAnchor(), collisionPoint);
+//        double impactCoefficient = getImpactCoefficient(collisionRelativeVector);
+//        Point2D impactVector = normalizeVector(collisionRelativeVector);
+//        impactVector = multiplyVector(impactVector ,impactCoefficient);
+//        Point2D r2 = addVectors(this.getDirection().getNormalizedDirectionVector(), impactVector);
+//        Direction direction = new Direction((r2));
+//        if (impactCoefficient != 0) this.setDirection(direction);
+    }
+
+
+    @Override
+    public void impact(Point2D normalVector, Point2D collisionPoint, Collidable polygon) {
+        double impactCoefficient = getImpactCoefficient(normalVector);
+        Point2D impactVector = reflect(relativeLocation(getAnchor(), collisionPoint));
+        impactVector = multiplyVector(impactVector ,impactCoefficient);
+
+
+        if (this.getDirection().getMagnitude() < 2){
+            setDirection(new Direction(normalizeVector(relativeLocation(getAnchor(), collisionPoint))));
+        }
+        else {
+            setDirection(new Direction(normalizeVector(impactVector)));
+        }
+
+
+    }
+
+    @Override
+    public double getImpactCoefficient(Point2D collisionRelativeVector) {
+        double distance = Math.hypot(collisionRelativeVector.getX(), collisionRelativeVector.getY());
+        double impactCoefficient;
+        if (distance < SMALL_IMPACT_RADIUS) {
+            setImpactInProgress(true);
+            impactCoefficient = 4;
+        } else if (distance > LARGE_IMPACT_RADIUS) {
+            setImpactInProgress(false);
+            impactCoefficient = 0;
+        } else {
+            setImpactInProgress(true);
+            double coefficient = 1-(distance- SMALL_IMPACT_RADIUS)/(LARGE_IMPACT_RADIUS - SMALL_IMPACT_RADIUS);
+            impactCoefficient = coefficient * 4;
+        }
+        return impactCoefficient;
+    }
+
+    @Override
+    public void banish() {
+
+    }
+
+    @Override
     public Point2D[] getVertices() {
+
+//        return this.vertices;
         return null;
     }
 
@@ -141,6 +173,9 @@ public class EpsilonModel implements Movable, Collidable {
     public void move(Direction direction) {
         Point2D movement = multiplyVector(direction.getNormalizedDirectionVector(), direction.getMagnitude());
         this.anchor = addVectors(anchor, movement);
+        for (int i = 0; i < numberOfVertices; i++) {
+            vertices.set(i, addVectors(vertices.get(i), movement));
+        }
 
     }
 
@@ -153,6 +188,12 @@ public class EpsilonModel implements Movable, Collidable {
     public boolean isCircular() {
         return true;
     }
+
+    @Override
+    public double getRadius() {
+        return RADIUS;
+    }
+
     @Override
     public void friction(){
         if (isImpactInProgress()){
@@ -171,6 +212,8 @@ public class EpsilonModel implements Movable, Collidable {
     }
 
     public Point2D reflect(Point2D normalVector){
+
+//        Point2D r=
         double dotProduct = dotVectors(getDirection().getDirectionVector(), normalVector);
         Point2D reflection = addVectors(
                 getDirection().getDirectionVector(),
@@ -178,4 +221,29 @@ public class EpsilonModel implements Movable, Collidable {
                 ));
         return normalizeVector(reflection);
     }
+
+
+    // Writ of Proteus:
+    public void addVertex(){
+        numberOfVertices++;
+        vertices.clear();
+
+        for (int i = 0; i < numberOfVertices; i++) {
+            double alpha = 2*PI*i/numberOfVertices;
+            vertices.add(new Point2D.Double(getAnchor().getX()+RADIUS*Math.cos(alpha), getAnchor().getY()+RADIUS*Math.sin(alpha)));
+        }
+    }
+
+    public void setHp(int hp) {
+        this.hp = hp;
+    }
+
+    public void sumHpWith(int hp){
+        this.hp += hp;
+        if (this.hp >100) this.hp=100;
+    }
+    public int getHp() {
+        return hp;
+    }
+
 }
