@@ -1,16 +1,13 @@
 package org.example;
-import controller.*;
+import controller.Game;
+import controller.Sound;
 import view.MainFrame;
-import view.charactersView.Menu;
+import view.Menu;
+import view.SkillTreeMenu;
 
 import javax.sound.sampled.*;
 
-import java.awt.*;
-import java.io.File;
 import java.io.IOException;
-
-import static controller.Constants.FRAME_DIMENSION;
-import static java.awt.Color.black;
 
 public class Main {
 
@@ -19,7 +16,18 @@ public class Main {
 
 
         MainFrame.getINSTANCE();
-//        new Menu();
+        new Sound();
+
+
+
         new Game();
+
+
+
+//        new Menu();
+
+//        new SkillTreeMenu();
+
+//        new Game();
     }
 }

@@ -4,12 +4,14 @@ package view;
 
 import controller.MouseController;
 import model.BulletModel;
+import model.charactersModel.SquarantineModel;
 import model.collision.Collidable;
 import model.collision.CollisionState;
 import model.collision.Impactable;
 import model.movement.Direction;
 import model.movement.Movable;
 import view.charactersView.Drawable;
+import view.charactersView.SquarantineView;
 
 import javax.swing.*;
 
@@ -17,8 +19,11 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 
 import static controller.Constants.*;
+import static controller.Game.bufferedImageResult;
+//import static controller.Game.squarantine;
 import static controller.Utils.addVectors;
 import static view.charactersView.Drawable.drawables;
+import static view.charactersView.SquarantineView.squarantineViews;
 
 //public final class myPanel extends JPanel  implements Collidable {
 public final class MainPanel extends JPanel implements Collidable, Impactable, Movable {
@@ -82,6 +87,12 @@ public final class MainPanel extends JPanel implements Collidable, Impactable, M
         for(Drawable obj: drawables){
             obj.draw(g);
         }
+
+//        for (SquarantineView squarantineView:squarantineViews){
+////            super.paintComponent(g);
+//        g.drawImage(bufferedImageResult, (int)squarantineView.getCurrentLocation().getX(), (int) squarantineView.getCurrentLocation().getY(), this); // see javadoc for more info on the parameters
+//        }
+
     }
 
     public static MainPanel getINSTANCE() {

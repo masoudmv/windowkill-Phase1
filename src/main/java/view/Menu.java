@@ -1,4 +1,4 @@
-package view.charactersView;
+package view;
 
 import view.MainFrame;
 
@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.Point2D;
 
 import static java.awt.Color.*;
 
@@ -15,34 +16,34 @@ public class Menu extends JPanel implements MouseListener {
     JLabel tutorialLabel = new JLabel("Tutorial");
     JLabel skillTreeLabel = new JLabel("SkillTree");
     JLabel exitLabel = new JLabel("Exit");
+    Point start = new Point(400, 100);
+    Point settings = new Point(400, 200);
+    Point tutorial = new Point(400, 300);
+    Point skillTree = new Point(400, 400);
+    Point exit = new Point(400, 500);
+    private int buttonHeight = 50;
+    private int buttonWidth = 100;
 
     public Menu() {
         MainFrame frame = MainFrame.getINSTANCE();
         Dimension dimension = new Dimension(600, 600);
         setSize(dimension);
-//        setBackground(yellow);
         setVisible(true);
         setLocationToCenter(frame);
-//        JLabel label = new JLabel("sdsdsdsdsdsd");
-        startLabel.setBounds(435, 100,100,50);
-        settingsLabel.setBounds(425, 200,100,50);
-        tutorialLabel.setBounds(425, 300,100,50);
-        skillTreeLabel.setBounds(425, 400,100,50);
-        exitLabel.setBounds(435, 500,100,50);
-//        startLabel.setLocation(400,150);
-
-//        label.s
-
-
-
+        startLabel.setBounds(435, 100,buttonWidth,buttonHeight);
+        settingsLabel.setBounds(425, 200,buttonWidth,buttonHeight);
+        tutorialLabel.setBounds(425, 300,buttonWidth,buttonHeight);
+        skillTreeLabel.setBounds(425, 400,buttonWidth,buttonHeight);
+        exitLabel.setBounds(435, 500,buttonWidth,buttonHeight);
         add(startLabel);
         add(settingsLabel);
         add(tutorialLabel);
         add(skillTreeLabel);
         add(exitLabel);
         setLayout(null);
-
         addMouseListener(this);
+
+
         frame.add(this);
     }
 
@@ -50,19 +51,13 @@ public class Menu extends JPanel implements MouseListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         setBackground(Color.black);
-//        g.setColor(white);
-//        startLabel.setVerticalAlignment(1);
         g.setColor(gray);
-
-        g.fillRect(400, 100,100,50);
-        g.fillRect(400,200,100,50);
-        g.fillRect(400,300,100,50);
-        g.fillRect(400,400,100,50);
+        g.fillRect(start.x,start.y, 100, 50);
+        g.fillRect(settings.x,settings.y,100,50);
+        g.fillRect(tutorial.x,tutorial.y,100,50);
+        g.fillRect(skillTree.x,skillTreeLabel.getY(),100,50);
         g.fillRect(400,500,100,50);
-
-
         labelRepaint();
-
     }
 
     private void labelRepaint(){
@@ -79,9 +74,18 @@ public class Menu extends JPanel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-//        if ( e.getY()>334 && e.getY()<534 && 418<e.getX() && e.getX()<618) System.out.println("heal chosen");
-//        if ( e.getY()>334 && e.getY()<534 && 668<e.getX() && e.getX()<868) System.out.println("emp chosen");
-//        if ( e.getY()>334 && e.getY()<534 && 918<e.getX() && e.getX()<1118) System.out.println("banish chosen");
+        if ( e.getY()>start.y && e.getY()<start.y+buttonHeight && start.x<e.getX() && e.getX()<start.x+buttonWidth) System.out.println("start chosen");
+        if ( e.getY()>settings.y && e.getY()<settings.y+buttonHeight && settings.x<e.getX() && e.getX()<settings.x+buttonWidth) System.out.println("settings chosen");
+        if ( e.getY()>tutorial.y && e.getY()<tutorial.y+buttonHeight && tutorial.x<e.getX() && e.getX()<tutorial.x+buttonWidth) System.out.println("tutorial chosen");
+        if ( e.getY()>skillTree.y && e.getY()<skillTree.y+buttonHeight && skillTree.x<e.getX() && e.getX()<skillTree.x+buttonWidth){
+            MainFrame.getINSTANCE().remove(this);
+            MainFrame.getINSTANCE().repaint();
+            new SkillTreeMenu();
+        }
+        if ( e.getY()>exit.y && e.getY()<exit.y+buttonHeight && exit.x<e.getX() && e.getX()<exit.x+buttonWidth){
+            System.exit(0);
+        }
+
     }
 
     @Override

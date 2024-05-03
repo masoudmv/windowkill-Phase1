@@ -2,6 +2,7 @@
 package model.charactersModel;
 
 import model.BulletModel;
+import model.CollectibleModel;
 import model.collision.Collidable;
 import model.collision.CollisionState;
 import model.collision.Impactable;
@@ -10,10 +11,13 @@ import model.movement.Movable;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.UUID;
 
 import static controller.Constants.*;
 import static controller.Controller.*;
+import static controller.Sound.playBubble;
+import static controller.Sound.playDeathSound;
 import static controller.Utils.*;
 
 public class TrigorathModel implements Movable, Collidable, Impactable {
@@ -376,6 +380,26 @@ public class TrigorathModel implements Movable, Collidable, Impactable {
         movables.remove(this);
         trigorathModels.remove(this);
         findTrigorathView(id).remove();
+        dropCollectible();
+        playDeathSound();
+    }
+
+    public void dropCollectible() {
+        Point2D direction = relativeLocation(getAnchor(), EpsilonModel.getINSTANCE().getAnchor());
+        Random random = new Random();
+        double theta = random.nextGaussian(Math.PI, 1);
+        if (theta<PI/2) theta = PI/2;
+        if (theta>3*PI/2) theta = 3*PI/2;
+        System.out.println(theta);
+        new CollectibleModel(getAnchor(), rotateVector(direction, theta));
+
+        theta = random.nextGaussian(Math.PI, 1);
+        if (theta<PI/2) theta = PI/2;
+        if (theta>3*PI/2) theta = 3*PI/2;
+        System.out.println(theta);
+        new CollectibleModel(getAnchor(), rotateVector(direction, theta));
+
+
     }
 
     public int getHp() {
@@ -387,5 +411,10 @@ public class TrigorathModel implements Movable, Collidable, Impactable {
     }
     public void sumHpWith(int hp){
         this.hp += hp;
+    }
+    // damage parameter is a positive number
+    public void damage(int damage){
+        this.hp -= damage;
+        playBubble();
     }
 }

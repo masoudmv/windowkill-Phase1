@@ -1,6 +1,5 @@
 package controller;
 
-import com.sun.source.tree.IfTree;
 import model.BulletModel;
 import model.CollectibleModel;
 import model.charactersModel.EpsilonModel;
@@ -8,7 +7,6 @@ import model.charactersModel.SquarantineModel;
 import model.charactersModel.TrigorathModel;
 import model.movement.Direction;
 import model.movement.Movable;
-import org.example.Main;
 import view.*;
 import view.charactersView.SquarantineView;
 import view.charactersView.TrigorathView;
@@ -17,11 +15,16 @@ import view.charactersView.EpsilonView;
 import javax.swing.*;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static controller.Constants.BULLET_VELOCITY;
 import static controller.Constants.TRIGORATH_MAX_VEL_RADIUS;
@@ -33,6 +36,7 @@ import static controller.Game.ShopAbility.*;
 import static controller.Game.SkillTreeAbility.*;
 import static controller.MouseController.*;
 import static controller.Utils.*;
+import static model.CollectibleModel.collectibleModels;
 import static model.charactersModel.SquarantineModel.squarantineModels;
 import static model.charactersModel.TrigorathModel.trigorathModels;
 import static model.collision.Collidable.collidables;
@@ -57,61 +61,35 @@ public class Update implements KeyListener {
     private Timer gameLoop;
     private ShopPanel shopPanel=null;
     private int extraBullet=0;
-//    public static double elap
 
 
 
     public Update() {
         MainFrame.getINSTANCE().addKeyListener(this);
-        gameLoop = new Timer(10, e -> updateView()){{setCoalesce(true);}};
-        gameLoop.start();
-//        new Timer(10, new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                updateView();
-//            }
-//        });
 
 
-//        new Timer((int) MODEL_UPDATE_TIME, e -> updateModel()){{setCoalesce(true);}}.start();
+        int delay = 10; //milliseconds
+        ActionListener taskPerformer = new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                //...Perform a task...
+                updateModel();
+                updateView();
+            }
+        };
+
+        gameLoop = new Timer(delay, taskPerformer);
 
 
-    }
-
-//    @Override
-//    public void run() {
-//        long startTime, elapsedTime, waitTime;
-//
-//        while (running) {
-//            startTime = System.nanoTime();
-//
-//            updateModel();
+//        gameLoop = new Timer(MOVEMENT_DELAY, e -> {
 //            updateView();
-//
-//            elapsedTime = System.nanoTime() - startTime;
-//            waitTime = targetTime - elapsedTime / 1000000;
-//
-//            if (waitTime < 0) waitTime = 5; // Ensure some delay to prevent the loop from spinning too fast.
-//
-//            try {
-//                Thread.sleep(waitTime);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
-
-    private void startMovementTimer() {
-//        movementTimer = new Timer(MOVEMENT_DELAY, new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                updateMovement();
-//            }
+//            updateModel();
 //        });
-//        movementTimer.start();
+        gameLoop.start();
 
     }
+
+
+    private void startMovementTimer() {}
 
     private void stopMovementTimer() {
         if (movementTimer != null) {
@@ -150,9 +128,12 @@ public class Update implements KeyListener {
     }
 
     public void updateView(){
+
+
+
         long currentTickTime = System.currentTimeMillis();
         long interval = currentTickTime - lastTickTime;
-        System.out.println("Interval between updates: " + interval + " ms");
+//        System.out.println("Interval between updates: " + interval + " ms");
         lastTickTime = currentTickTime;
 
 
@@ -163,7 +144,7 @@ public class Update implements KeyListener {
         if (!EpsilonModel.getINSTANCE().isImpactInProgress()) updateMovement();
 //        System.out.println(EpsilonModel.getINSTANCE().isImpactInProgress());
 
-        updateModel();
+
         // Increment frame count every time updateView is called
         frameCount++;
 
@@ -249,6 +230,21 @@ public class Update implements KeyListener {
             }
         }
 
+        for (CollectibleModel collectibleModel: collectibleModels){
+
+            if (collectibleModel.impactInProgress){
+                collectibleModel.getDirection().accelerateDirection(collectibleModel.impactMaxVel);
+                if (collectibleModel.getDirection().getMagnitude() > collectibleModel.impactMaxVel){
+                    collectibleModel.impactInProgress = false;
+                }
+            }
+
+            collectibleModel.friction();
+
+            collectibleModel.move();
+        }
+
+
         // Current time in milliseconds
         long currentTime = System.currentTimeMillis();
 
@@ -285,7 +281,7 @@ public class Update implements KeyListener {
             extraBullet =0;
             tripleShot=false;
         }
-        if (empowerIsOn && tripleShot && mousePosition!=null && extraBullet<2){
+        if (empowerIsOn && tripleShot && mousePosition!=null && extraBullet<2 && lastShot > empowerStartTime){
             if (elapsedTime-lastShot>0.05){
                 new BulletModel(EpsilonModel.getINSTANCE().getAnchor(), lastBullet.getDirection());
 //                SoundHandler.playClip();
@@ -349,9 +345,9 @@ public class Update implements KeyListener {
 
         }
 
-        if (e.getKeyCode() == KeyEvent.VK_T){
-            new CollectibleModel(new Point2D.Double(500, 400));
-        }
+//        if (e.getKeyCode() == KeyEvent.VK_T){
+//            new CollectibleModel(new Point2D.Double(500, 400));
+//        }
 
         if (gameLoop.isRunning()) {
             if (e.getKeyCode() == KeyEvent.VK_E){
@@ -378,6 +374,7 @@ public class Update implements KeyListener {
             }
 
         }
+
 
 
 

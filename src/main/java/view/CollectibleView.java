@@ -43,7 +43,7 @@ public class CollectibleView implements Drawable {
 
     @Override
     public void draw(Graphics g) {
-        g.setColor(Color.white);
+        g.setColor(Color.green);
         Point2D location = this.getCurrentLocation();
         g.fillOval((int) (location.getX()-BULLET_RADIUS), (int) (location.getY()-BULLET_RADIUS), (int) (2 *BULLET_RADIUS), (int) (2*BULLET_RADIUS));
 

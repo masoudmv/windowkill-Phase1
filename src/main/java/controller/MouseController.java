@@ -21,6 +21,7 @@ import java.util.Timer;
 
 import static controller.Constants.BULLET_VELOCITY;
 import static controller.Game.*;
+//import static controller.Sound.sound;
 import static controller.SoundHandler.doPlay;
 //import static controller.SoundHandler.playSound;
 
@@ -56,7 +57,6 @@ public class MouseController implements MouseListener {
             double velY = deltaY * (BULLET_VELOCITY / pot);
             Point2D direction = new Point2D.Double(velX, velY);
             mousePosition=new Point2D.Double(e.getX(), e.getY());
-
             lastBullet = new BulletModel(epsilon.getAnchor(), new Direction(direction));
             lastShot=elapsedTime;
             if (elapsedTime < empowerEndTime) tripleShot=true;

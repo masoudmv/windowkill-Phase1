@@ -1,7 +1,11 @@
 package model.collision;
+import controller.Game;
 import controller.Sound;
 import model.BulletModel;
 import model.CollectibleModel;
+import model.charactersModel.EpsilonModel;
+import model.charactersModel.SquarantineModel;
+import model.charactersModel.TrigorathModel;
 import view.MainPanel;
 
 import java.awt.geom.Line2D;
@@ -10,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static controller.Game.clip;
+import static controller.Sound.*;
 import static controller.SoundHandler.doPlay;
 //import static controller.SoundHandler.playSound;
 import static controller.Utils.*;
@@ -24,38 +29,47 @@ public interface Collidable {
 
 
     default void collides(Collidable collidable){
-        if (isCircular() && !collidable.isCircular()){
+        if (isCircular() && !collidable.isCircular() && !(this instanceof CollectibleModel )){
             Point2D intersection = closestPointOnPolygon(getAnchor(), collidable.getVertices());
 
             if (intersection.distance(getAnchor()) <= getRadius()){
                 if (this instanceof BulletModel) {
-//                    new Thread(() -> {
-//                        //            if (clip != null) {
-//                        clip.stop();          // Stop the clip before rewinding it
-//                        clip.setFramePosition(0);  // Rewind to the beginning
-//                        clip.start();         // Start playing
-//                                    }
-//                    }).start();
 
-//                    new Thread(() -> {
-
-//                    }).start();
+                    if (!(collidable instanceof MainPanel)){
+//                        Sound sound = new Sound("C:\\Users\\masoo\\Desktop\\Projects\\windowkill_AP\\src\\main\\resources\\burst2.wav");
 
 
-                    Sound sound = new Sound("C:\\Users\\masoo\\Desktop\\Projects\\windowkill_AP\\src\\main\\resources\\burst2.wav");
-                    sound.play();
+                        // temperory position
+
+
+                        if (collidable instanceof  SquarantineModel) ((SquarantineModel)collidable).remove();
+                        if (collidable instanceof  TrigorathModel) ((TrigorathModel)collidable).remove();
+                    }
+
+
+
+
+//                    if (collidable instanceof  SquarantineModel) ((SquarantineModel)collidable).damage(5);
+//                    if (collidable instanceof  TrigorathModel) ((TrigorathModel)collidable).damage(5);
                     ((BulletModel) this).bulletImpact((BulletModel) this, intersection, collidable);
-
-
                 }
                 else if (!(collidable instanceof MainPanel) && !(this instanceof MainPanel)) {
 
                     double minDistance = Double.MAX_VALUE;
                     for (Point2D vertex: collidable.getVertices()){
                         if (intersection.distance(vertex)<minDistance) minDistance=intersection.distance(vertex);
-                    }
+                    } if (minDistance<1) System.out.println("Damaged epsilon!");
 
-                    if (minDistance<1) System.out.println("Damaged!");
+
+                    // not sure the following code works. have not tested it
+                    minDistance = Double.MAX_VALUE;
+                    EpsilonModel epsilon = EpsilonModel.getINSTANCE();
+                    if (epsilon.getVertices() != null) {
+                        for (Point2D vertex: epsilon.getVertices()){
+                            if (intersection.distance(vertex)<minDistance) minDistance=intersection.distance(vertex);
+                        }
+                        if (minDistance<1) System.out.println("Damaged enemy!");
+                    }
 
 
                     for (Collidable coll : collidables){
@@ -79,6 +93,22 @@ public interface Collidable {
         } else if (!isCircular() && !collidable.isCircular()){
             if (!(collidable instanceof MainPanel) && !(this instanceof MainPanel)) findSingleIntersectionPoint(collidable);
         }
+
+
+        if (isCircular() && collidable.isCircular() && (!(collidable instanceof BulletModel)) && (!(this instanceof BulletModel))){
+            if (this instanceof CollectibleModel && collidable instanceof CollectibleModel){}
+            else {
+                Point2D dist = relativeLocation(getAnchor(), collidable.getAnchor());
+                double distance = Math.hypot(dist.getX(), dist.getY());
+                if (distance < getRadius()+collidable.getRadius()){
+                    Game.getINSTANCE().sumXpWith(5);
+                    ((CollectibleModel)collidable).remove();
+
+                }
+            }
+        }
+
+
 
     }
 

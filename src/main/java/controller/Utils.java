@@ -119,5 +119,15 @@ public class Utils {
     }
 
 
+    public static Point2D rotateVector(Point2D vector, double theta){
+        double x = vector.getX();
+        double y = vector.getY();
+        double length = Math.sqrt(x*x + y*y);
+        double alpha = Math.atan(y/x);
+        double alphaPrime = alpha-theta;
+        return new Point2D.Double(length*Math.cos(alphaPrime), length*Math.sin(alphaPrime));
+    }
+
+
 
 }

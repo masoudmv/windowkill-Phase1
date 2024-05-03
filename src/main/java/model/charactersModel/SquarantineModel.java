@@ -1,6 +1,7 @@
 package model.charactersModel;
 
 import model.BulletModel;
+import model.CollectibleModel;
 import model.collision.Collidable;
 import model.collision.CollisionState;
 import model.collision.Impactable;
@@ -14,6 +15,8 @@ import java.util.UUID;
 
 import static controller.Constants.*;
 import static controller.Controller.*;
+import static controller.Sound.playBubble;
+import static controller.Sound.playDeathSound;
 import static controller.Utils.*;
 
 public class SquarantineModel implements Movable, Collidable, Impactable {
@@ -295,6 +298,8 @@ public class SquarantineModel implements Movable, Collidable, Impactable {
         movables.remove(this);
         squarantineModels.remove(this);
         findSquarantineView(id).remove();
+        dropCollectible();
+        playDeathSound();
     }
 
     public int getHp() {
@@ -303,5 +308,26 @@ public class SquarantineModel implements Movable, Collidable, Impactable {
 
     public void setHp(int hp) {
         this.hp = hp;
+    }
+
+    // damage parameter is a positive number
+    public void damage(int damage){
+        this.hp -= damage;
+        playBubble();
+    }
+
+
+    public void dropCollectible() {
+//        remove();
+        Point2D direction = relativeLocation(getAnchor(), EpsilonModel.getINSTANCE().getAnchor());
+        Random random = new Random();
+        double theta = random.nextGaussian(Math.PI, 1);
+//        System.out.println(theta);
+        if (theta<PI/2) theta = PI/2;
+        if (theta>3*PI/2) theta = 3*PI/2;
+
+        System.out.println(theta);
+        new CollectibleModel(getAnchor(), rotateVector(direction, theta));
+//        new CollectibleModel(getAnchor(), direction);
     }
 }

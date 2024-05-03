@@ -11,12 +11,16 @@ import model.movement.Movable;
 import view.MainPanel;
 import view.MainFrame;
 
+import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
 import static controller.Constants.*;
 import static controller.Utils.*;
@@ -26,6 +30,7 @@ import static model.movement.Movable.movables;
 
 
 public class Game {
+
 
 
     private static Game INSTANCE;
@@ -38,11 +43,30 @@ public class Game {
     public static SkillTreeAbility skillTreeAbility=null;
     public static boolean empowerIsOn = false;
     public static double empowerEndTime = Double.MAX_VALUE;
+    public static double empowerStartTime = Double.MAX_VALUE;
     public static Clip clip;
+    private int epsilonMeleeDamage=10;
+    private int epsilonRangedDamage=5;
+
+
+    public static BufferedImage bufferedImage;
+    public static Image bufferedImageResult;
 
 
 
     public Game (){
+
+        // TODO add image to game
+        try {
+//            squarantine = ImageIO.read(new File("C:\\Users\\masoo\\Desktop\\Projects\\windowkill_AP\\src\\main\\resources\\squarantine.png"));
+            bufferedImage = ImageIO.read(new File("C:\\Users\\masoo\\Desktop\\Projects\\windowkill_AP\\src\\main\\resources\\squarantine.png"));
+            bufferedImageResult = bufferedImage.getScaledInstance(50, 50, Image.SCALE_DEFAULT);
+
+
+        } catch (IOException ex) {
+            // handle exception...
+
+    }
 
 
 
@@ -58,15 +82,16 @@ public class Game {
 //            new SquarantineModel(new Point2D.Double(500,500));
 //            new SquarantineModel(new Point2D.Double(200,700));
 //            new SquarantineModel(new Point2D.Double(500,300));
-            new SquarantineModel(new Point2D.Double(900,900));
-            new SquarantineModel(new Point2D.Double(800,900));
+//            new SquarantineModel(new Point2D.Double(900,900));
+//            new SquarantineModel(new Point2D.Double(800,900));
 
-//            new TrigorathModel(new Point2D.Double(600,700));
-//            new TrigorathModel(new Point2D.Double(700,1000));
-//            new TrigorathModel(new Point2D.Double(300,500));
-//            new TrigorathModel(new Point2D.Double(700,200));
-//            new TrigorathModel(new Point2D.Double(900,900));
-//            new TrigorathModel(new Point2D.Double(1000,1000));
+            new TrigorathModel(new Point2D.Double(600,700));
+            new TrigorathModel(new Point2D.Double(700,1000));
+            new TrigorathModel(new Point2D.Double(300,500));
+            new TrigorathModel(new Point2D.Double(700,200));
+            new TrigorathModel(new Point2D.Double(900,900));
+            new TrigorathModel(new Point2D.Double(1000,1000));
+//            Sound.sound = new Sound("C:\\Users\\masoo\\Desktop\\Projects\\windowkill_AP\\src\\main\\resources\\burst2.wav");
             MainPanel.getINSTANCE();
             new Update();
 
@@ -105,6 +130,7 @@ public class Game {
         if (Game.getINSTANCE().getXp() >= 0){
             // TODO add XP handler -75
             System.out.println("empower");
+            empowerStartTime = elapsedTime;
             empowerEndTime = elapsedTime + 10;
             empowerIsOn = true;
 //            Game.getINSTANCE().sumXpWith(-75);
@@ -117,6 +143,21 @@ public class Game {
                 impactable.banish();
             }
 //            Game.getINSTANCE().sumXpWith(-100);
+        }
+    }
+
+    public void ares(){
+        if (xp >= 100){
+            epsilonMeleeDamage+=2;
+            epsilonRangedDamage+=2;
+            xp-=100;
+        }
+    }
+
+    public void proteus(){
+        if (xp >= 100){
+            EpsilonModel.getINSTANCE().addVertex();
+            xp-=100;
         }
     }
 
