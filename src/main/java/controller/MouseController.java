@@ -10,6 +10,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -20,12 +21,15 @@ import java.sql.Time;
 import java.util.Timer;
 
 import static controller.Constants.BULLET_VELOCITY;
+import static controller.Constants.PI;
 import static controller.Game.*;
+import static controller.Utils.findAngleBetweenTwoVectors;
+import static controller.Utils.relativeLocation;
 //import static controller.Sound.sound;
-import static controller.SoundHandler.doPlay;
+//import static controller.SoundHandler.doPlay;
 //import static controller.SoundHandler.playSound;
 
-public class MouseController implements MouseListener {
+public class MouseController implements MouseListener,MouseMotionListener {
     private EpsilonModel epsilon;
     public static double lastShot = 0;
     public static Point2D mousePosition = null;
@@ -34,14 +38,12 @@ public class MouseController implements MouseListener {
 
     public MouseController(){
         this.epsilon = EpsilonModel.getINSTANCE();
-//        MainFrame.getINSTANCE().addMouseListener(this);
-//        MainPanel.getINSTANCE().addMouseListener(this);
+        MainFrame.getINSTANCE().addMouseMotionListener(this);
 
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-//        System.out.println(elapsedTime-lastShot);
         if (elapsedTime-lastShot>0.15) {
 
             double startX = epsilon.getAnchor().getX();
@@ -91,5 +93,23 @@ public class MouseController implements MouseListener {
     }
 
 
+    @Override
+    public void mouseDragged(MouseEvent e) {}
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        EpsilonModel epsilon = EpsilonModel.getINSTANCE();
+        Point2D vectorFromEpsilon = relativeLocation(e.getPoint(), epsilon.getAnchor());
+        double x = vectorFromEpsilon.getX();
+        double y = vectorFromEpsilon.getY();
+        double tangentOfAlpha = vectorFromEpsilon.getY() / vectorFromEpsilon.getX();
+        double alpha=0;
+        if (0<=x && 0<=y) alpha =  Math.atan(tangentOfAlpha);
+        if (x<0 && 0<y)alpha =  Math.atan(tangentOfAlpha)+PI;
+        if (x<0 && y<0)alpha =  Math.atan(tangentOfAlpha)+PI;
+        if (0<x && y<0) alpha =  Math.atan(tangentOfAlpha)+2*PI;
+        epsilon.setAngle(alpha);
+        epsilon.updateVertices();
+    }
 }
 

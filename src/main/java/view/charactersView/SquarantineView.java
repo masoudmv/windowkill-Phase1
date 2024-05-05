@@ -42,7 +42,9 @@ public class SquarantineView implements Drawable{
         int[] yPoly = new int[]{(int) vertices[0].getY(), (int) vertices[1].getY(), (int) vertices[2].getY(), (int) vertices[3].getY()};
         g.setColor(Color.white);
         Polygon poly = new Polygon(xPoly, yPoly, xPoly.length);
-        g.fillPolygon(poly);
+        g.setColor(Color.green);
+        g.drawPolygon(poly);
+//        g.fillPolygon(poly);
 
 
 

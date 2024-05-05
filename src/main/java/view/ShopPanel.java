@@ -1,24 +1,17 @@
 package view;
 
 import controller.Game;
+import controller.Update;
 import model.charactersModel.EpsilonModel;
 import org.example.Main;
-import view.charactersView.Drawable;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.font.GlyphMetrics;
-import java.awt.geom.Rectangle2D;
 
-import static controller.Constants.FRAME_DIMENSION;
-import static controller.Constants.PANEL_SIZE;
-import static controller.Game.ShopAbility.*;
-import static java.awt.Color.blue;
+//import static controller.Game.ShopAbility.*;
 import static java.awt.Color.white;
-import static view.charactersView.Drawable.drawables;
 
 public class ShopPanel extends JPanel implements MouseListener {
 
@@ -58,45 +51,46 @@ public class ShopPanel extends JPanel implements MouseListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         setBackground(Color.black);
-
-
-        g.drawRect(50, 50,200,200);
-        g.drawRect(300,50,200,200);
-        g.drawRect(550,50,200,200);
+        g.drawImage(Main.heal, 50, 50, this);
+        g.drawImage(Main.empower, 300, 50, this);
+        g.drawImage(Main.banish, 550, 50, this);
 
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-//        TODO shop empower, heal, banish selection
 
-        if ( e.getY()>334 && e.getY()<534 && 418<e.getX() && e.getX()<618) Game.shopAbility = HEAL;
-        if ( e.getY()>334 && e.getY()<534 && 668<e.getX() && e.getX()<868) Game.shopAbility = EMPOWER;
-        if ( e.getY()>334 && e.getY()<534 && 918<e.getX() && e.getX()<1118) Game.shopAbility = BANISH;
+        if ( e.getY()>334 && e.getY()<534 && 418<e.getX() && e.getX()<618 && Game.getINSTANCE().getInGameXp() >= 50) {
+            Update.shopAbility = Update.ShopAbility.heal;
+            Game.getINSTANCE().sumInGameXpWith(-50);
+            MainFrame.label.setText("<html>Wave: "+ Game.wave + "<br>Elapsed Time: "+ (int) Game.elapsedTime
+                    + "<br> XP: "+Game.inGameXP +"<br>HP: "+ EpsilonModel.getINSTANCE().getHp());
+        }
+        if ( e.getY()>334 && e.getY()<534 && 668<e.getX() && e.getX()<868 && Game.getINSTANCE().getInGameXp() >= 75) {
+            Update.shopAbility = Update.ShopAbility.empower;
+            Game.getINSTANCE().sumInGameXpWith(-75);
+            MainFrame.label.setText("<html>Wave: "+ Game.wave + "<br>Elapsed Time: "+ (int) Game.elapsedTime
+                    + "<br> XP: "+Game.inGameXP +"<br>HP: "+ EpsilonModel.getINSTANCE().getHp());        }
+        if ( e.getY()>334 && e.getY()<534 && 918<e.getX() && e.getX()<1118 && Game.getINSTANCE().getInGameXp() >= 100) {
+            Update.shopAbility = Update.ShopAbility.banish;
+            Game.getINSTANCE().sumInGameXpWith(-100);
+            MainFrame.label.setText("<html>Wave: "+ Game.wave + "<br>Elapsed Time: "+ (int) Game.elapsedTime
+                    + "<br> XP: "+Game.inGameXP +"<br>HP: "+ EpsilonModel.getINSTANCE().getHp());
+
+        }
 
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
-
-    }
+    public void mousePressed(MouseEvent e) {}
 
     @Override
-    public void mouseReleased(MouseEvent e) {
-
-    }
+    public void mouseReleased(MouseEvent e) {}
 
     @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
+    public void mouseEntered(MouseEvent e) {}
 
     @Override
-    public void mouseExited(MouseEvent e) {
-
-    }
-
-
-
+    public void mouseExited(MouseEvent e) {}
 
 }

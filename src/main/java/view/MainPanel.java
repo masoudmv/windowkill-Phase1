@@ -2,6 +2,7 @@ package view;
 
 //import view.charactersView.EpsilonView;
 
+import controller.Constants;
 import controller.MouseController;
 import model.BulletModel;
 import model.charactersModel.SquarantineModel;
@@ -10,6 +11,7 @@ import model.collision.CollisionState;
 import model.collision.Impactable;
 import model.movement.Direction;
 import model.movement.Movable;
+import org.example.Main;
 import view.charactersView.Drawable;
 import view.charactersView.SquarantineView;
 
@@ -48,12 +50,10 @@ public final class MainPanel extends JPanel implements Collidable, Impactable, M
 
 
     private MainPanel() {
-        Frame frame = MainFrame.getINSTANCE();
-        frame.addMouseListener(mouseController);
+        INSTANCE = this;
+        MainFrame frame = MainFrame.getINSTANCE();
         setSize(panelSize);
-        setLocationToCenter(MainFrame.getINSTANCE());
-        MainFrame.getINSTANCE().add(this);
-
+        setLocationToCenter(frame);
 
         vertex1 = new Point2D.Double((double) frame.getWidth() /2- (double) getWidth() /2, (double) frame.getHeight() /2- (double) getHeight() /2);
         vertex2 = addVectors(vertex1, new Point2D.Double(width, 0));
@@ -61,12 +61,9 @@ public final class MainPanel extends JPanel implements Collidable, Impactable, M
         vertex4 = addVectors(vertex3, new Point2D.Double(-width, 0));
         vertices = new Point2D[]{vertex1, vertex2, vertex3, vertex4};
 
-
-//        moveRight = false;
-
-
-
+        frame.addMouseListener(mouseController);
         Collidable.collidables.add(this);
+        frame.add(this);
     }
     public void setLocationToCenter(MainFrame glassFrame){
         setLocation(glassFrame.getWidth()/2-getWidth()/2,glassFrame.getHeight()/2-getHeight()/2);
@@ -80,7 +77,6 @@ public final class MainPanel extends JPanel implements Collidable, Impactable, M
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-
         setBackground(Color.BLACK);
 
 
@@ -88,10 +84,10 @@ public final class MainPanel extends JPanel implements Collidable, Impactable, M
             obj.draw(g);
         }
 
-//        for (SquarantineView squarantineView:squarantineViews){
-////            super.paintComponent(g);
-//        g.drawImage(bufferedImageResult, (int)squarantineView.getCurrentLocation().getX(), (int) squarantineView.getCurrentLocation().getY(), this); // see javadoc for more info on the parameters
-//        }
+
+
+
+
 
     }
 
@@ -369,5 +365,8 @@ public final class MainPanel extends JPanel implements Collidable, Impactable, M
 
     public MouseController getMouseController() {
         return mouseController;
+    }
+    public static void nullifyMainPanel(){
+        INSTANCE = null;
     }
 }

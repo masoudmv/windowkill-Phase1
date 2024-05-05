@@ -1,6 +1,5 @@
 package model.collision;
 import controller.Game;
-import controller.Sound;
 import model.BulletModel;
 import model.CollectibleModel;
 import model.charactersModel.EpsilonModel;
@@ -13,10 +12,10 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import static controller.Game.clip;
-import static controller.Sound.*;
-import static controller.SoundHandler.doPlay;
+//import static controller.SoundHandler.doPlay;
 //import static controller.SoundHandler.playSound;
+import static controller.Update.epsilonMeleeDamage;
+import static controller.Update.epsilonRangedDamage;
 import static controller.Utils.*;
 
 public interface Collidable {
@@ -36,21 +35,9 @@ public interface Collidable {
                 if (this instanceof BulletModel) {
 
                     if (!(collidable instanceof MainPanel)){
-//                        Sound sound = new Sound("C:\\Users\\masoo\\Desktop\\Projects\\windowkill_AP\\src\\main\\resources\\burst2.wav");
-
-
-                        // temperory position
-
-
-                        if (collidable instanceof  SquarantineModel) ((SquarantineModel)collidable).remove();
-                        if (collidable instanceof  TrigorathModel) ((TrigorathModel)collidable).remove();
                     }
-
-
-
-
-//                    if (collidable instanceof  SquarantineModel) ((SquarantineModel)collidable).damage(5);
-//                    if (collidable instanceof  TrigorathModel) ((TrigorathModel)collidable).damage(5);
+                    if (collidable instanceof  SquarantineModel) ((SquarantineModel)collidable).damage(epsilonRangedDamage);
+                    if (collidable instanceof  TrigorathModel) ((TrigorathModel)collidable).damage(epsilonRangedDamage);
                     ((BulletModel) this).bulletImpact((BulletModel) this, intersection, collidable);
                 }
                 else if (!(collidable instanceof MainPanel) && !(this instanceof MainPanel)) {
@@ -58,17 +45,17 @@ public interface Collidable {
                     double minDistance = Double.MAX_VALUE;
                     for (Point2D vertex: collidable.getVertices()){
                         if (intersection.distance(vertex)<minDistance) minDistance=intersection.distance(vertex);
-                    } if (minDistance<1) System.out.println("Damaged epsilon!");
+                    } if (minDistance==0 && collidable instanceof SquarantineModel) EpsilonModel.getINSTANCE().damage(6);
+                    if (minDistance==0 && collidable instanceof TrigorathModel) EpsilonModel.getINSTANCE().damage(10);
 
-
-                    // not sure the following code works. have not tested it
                     minDistance = Double.MAX_VALUE;
                     EpsilonModel epsilon = EpsilonModel.getINSTANCE();
-                    if (epsilon.getVertices() != null) {
-                        for (Point2D vertex: epsilon.getVertices()){
+                    if (epsilon.vertices != null) {
+                        for (Point2D vertex: epsilon.vertices){
                             if (intersection.distance(vertex)<minDistance) minDistance=intersection.distance(vertex);
                         }
-                        if (minDistance<1) System.out.println("Damaged enemy!");
+                        if (minDistance<5 && collidable instanceof SquarantineModel) ((SquarantineModel)collidable).damage(epsilonMeleeDamage);
+                        if (minDistance<5 && collidable instanceof TrigorathModel) ((TrigorathModel)collidable).damage(epsilonMeleeDamage);
                     }
 
 
@@ -101,7 +88,7 @@ public interface Collidable {
                 Point2D dist = relativeLocation(getAnchor(), collidable.getAnchor());
                 double distance = Math.hypot(dist.getX(), dist.getY());
                 if (distance < getRadius()+collidable.getRadius()){
-                    Game.getINSTANCE().sumXpWith(5);
+                    Game.getINSTANCE().sumInGameXpWith(5);
                     ((CollectibleModel)collidable).remove();
 
                 }

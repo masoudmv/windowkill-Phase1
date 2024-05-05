@@ -36,10 +36,15 @@ public class EpsilonView implements Drawable{
     public void draw (Graphics g){
         g.setColor(Color.white);
         Point2D location = this.getCurrentLocation();
-        g.fillOval((int) (location.getX()-RADIUS), (int) (location.getY()-RADIUS), (int) (2 *RADIUS), (int) (2*RADIUS));
+        g.drawOval((int) (location.getX()-RADIUS), (int) (location.getY()-RADIUS), (int) (2 *RADIUS), (int) (2*RADIUS));
+//        g.fillOval((int) (location.getX()-RADIUS), (int) (location.getY()-RADIUS), (int) (2 *RADIUS), (int) (2*RADIUS));
         for (int i = 0; i < vertices.size(); i++) {
-            g.setColor(Color.BLUE);
-            g.fillOval((int) vertices.get(i).getX(), (int) vertices.get(i).getY(), 5, 5 );
+            g.setColor(Color.red);
+            g.fillOval((int) vertices.get(i).getX()-2, (int) vertices.get(i).getY()-2, 4, 4);
+//            g.setColor(Color.red);
+//            g.setClip(1,2,3,4);
+//            g.drawLine((int) vertices.get(i).getX(), (int) vertices.get(i).getY(),
+//                    (int) vertices.get(i).getX(), (int) vertices.get(i).getY());
         }
     }
 

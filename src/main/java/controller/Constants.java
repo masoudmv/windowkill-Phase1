@@ -14,7 +14,7 @@ public class Constants {
     public static final double MODEL_UPDATE_TIME=(double) TimeUnit.SECONDS.toMillis(1)/UPS;
     public static final double EPSILON_MAX_SPEED = 3.5;
     public static final double SPEED = 1;
-    public static final double RADIUS = 15;
+    public static double RADIUS = 15;
     public static final double SQUARANTINE_EDGE = 40;
     public static final double SQUARANTINE_RADIUS = SQUARANTINE_EDGE/Math.sqrt(2);
     public static final double TRIGORATH_RADIUS = 25;

@@ -1,26 +1,32 @@
 package controller;
 
+import org.example.Main;
+
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 
+import static org.example.Main.soundVolume;
+
 public class Sound {
-    private Clip clip;
-//    public static Sound sound;
-    public static Clip bubble;
+    public static Clip collisionSound;
     public static Clip deathSound;
+    public static Clip victorySound;
     public Sound() {
-        // specify the sound to play
-        // (assuming the sound can be played by the audio system)
-        // from a wave File
         try {
-            File file = new File("C:\\Users\\masoo\\Desktop\\Projects\\windowkill_AP\\src\\main\\resources\\burst2.wav");
+            File file = new File("C:\\Users\\masoo\\Desktop\\Projects\\windowkill_AP\\src\\main\\resources\\collide.wav");
             if (file.exists()) {
                 AudioInputStream sound = AudioSystem.getAudioInputStream(file);
                 // load the sound into memory (a Clip)
-                bubble = AudioSystem.getClip();
-                bubble.open(sound);
+                collisionSound = AudioSystem.getClip();
+                collisionSound.open(sound);
+                FloatControl gainControl =
+                        (FloatControl) collisionSound.getControl(FloatControl.Type.MASTER_GAIN);
+
+                gainControl.setValue(calculateVolumeDecrement());
+
             }
             else {
                 throw new RuntimeException("Sound: file not found: ");
@@ -32,6 +38,24 @@ public class Sound {
                 // load the sound into memory (a Clip)
                 deathSound = AudioSystem.getClip();
                 deathSound.open(sound);
+                FloatControl gainControl =
+                        (FloatControl) deathSound.getControl(FloatControl.Type.MASTER_GAIN);
+                gainControl.setValue(calculateVolumeDecrement());
+            }
+            else {
+                throw new RuntimeException("Sound: file not found: ");
+            }
+
+
+            File victorySoundFile = new File("C:\\Users\\masoo\\Desktop\\Projects\\windowkill_AP\\src\\main\\resources\\victory.wav");
+            if (victorySoundFile.exists()) {
+                AudioInputStream sound = AudioSystem.getAudioInputStream(victorySoundFile);
+                // load the sound into memory (a Clip)
+                victorySound = AudioSystem.getClip();
+                victorySound.open(sound);
+                FloatControl gainControl =
+                        (FloatControl) victorySound.getControl(FloatControl.Type.MASTER_GAIN);
+                gainControl.setValue(calculateVolumeDecrement());
             }
             else {
                 throw new RuntimeException("Sound: file not found: ");
@@ -57,25 +81,28 @@ public class Sound {
             throw new RuntimeException("Sound: Line Unavailable Exception Error: " + e);
         }
 
-        // play, stop, loop the sound clip
     }
     public static void playBubble(){
-        bubble.setFramePosition(0);  // Must always rewind!
-//        clip.start();
-        bubble.loop(0);
+        collisionSound.setFramePosition(0);  // Must always rewind!
+        collisionSound.loop(0);
     }
 
     public static void playDeathSound(){
         deathSound.setFramePosition(0);  // Must always rewind!
-//        clip.start();
         deathSound.loop(0);
     }
 
-
-    public void loop(){
-        clip.loop(Clip.LOOP_CONTINUOUSLY);
+    public static void playVictorySound(){
+//        victorySound.setFramePosition(0);  // Must always rewind!
+        victorySound.loop(0);
     }
-    public void stop(){
-        clip.stop();
+
+//    public static void pauseAllSounds(){
+//        deathSound.stop();
+//
+//    }
+
+    private float calculateVolumeDecrement(){
+        return (float) 0.8*(soundVolume)-80;
     }
 }

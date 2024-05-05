@@ -20,7 +20,7 @@ import static controller.Utils.normalizeVector;
 
 public class EpsilonModel implements Movable, Collidable, Impactable {
     private static EpsilonModel INSTANCE;
-    private int hp = 100;
+    private int hp = 10;
     Point2D anchor;
     double radius;
     private boolean impactInProgress = false;
@@ -29,6 +29,7 @@ public class EpsilonModel implements Movable, Collidable, Impactable {
     public static ArrayList<EpsilonModel> epsilonModels = new ArrayList<>();
 
     public int numberOfVertices = 0;
+    private double angle=0;
 
     public ArrayList<Point2D> vertices = new ArrayList<>();
 
@@ -82,22 +83,22 @@ public class EpsilonModel implements Movable, Collidable, Impactable {
 
 
     //    @Override
-    public double getImpactCoefficient(double distance) {
-//        double distance = Math.hypot(collisionRelativeVector.getX(), collisionRelativeVector.getY());
-        double impactCoefficient;
-        if (distance < SMALL_IMPACT_RADIUS) {
-            setImpactInProgress(true);
-            impactCoefficient = IMPACT_COEFFICIENT;
-        } else if (distance > LARGE_IMPACT_RADIUS) {
-            setImpactInProgress(false);
-            impactCoefficient = 0;
-        } else {
-            setImpactInProgress(true);
-            double coefficient = 1-(distance- SMALL_IMPACT_RADIUS)/(LARGE_IMPACT_RADIUS - SMALL_IMPACT_RADIUS);
-            impactCoefficient = coefficient * IMPACT_COEFFICIENT;
-        }
-        return impactCoefficient;
-    }
+//    public double getImpactCoefficient(double distance) {
+////        double distance = Math.hypot(collisionRelativeVector.getX(), collisionRelativeVector.getY());
+//        double impactCoefficient;
+//        if (distance < SMALL_IMPACT_RADIUS) {
+//            setImpactInProgress(true);
+//            impactCoefficient = IMPACT_COEFFICIENT;
+//        } else if (distance > LARGE_IMPACT_RADIUS) {
+//            setImpactInProgress(false);
+//            impactCoefficient = 0;
+//        } else {
+//            setImpactInProgress(true);
+//            double coefficient = 1-(distance- SMALL_IMPACT_RADIUS)/(LARGE_IMPACT_RADIUS - SMALL_IMPACT_RADIUS);
+//            impactCoefficient = coefficient * IMPACT_COEFFICIENT;
+//        }
+//        return impactCoefficient;
+//    }
 
     @Override
     public Direction getDirection() {
@@ -139,15 +140,15 @@ public class EpsilonModel implements Movable, Collidable, Impactable {
     public double getImpactCoefficient(Point2D collisionRelativeVector) {
         double distance = Math.hypot(collisionRelativeVector.getX(), collisionRelativeVector.getY());
         double impactCoefficient;
-        if (distance < SMALL_IMPACT_RADIUS) {
+        if (distance < 50) {
             setImpactInProgress(true);
             impactCoefficient = 4;
-        } else if (distance > LARGE_IMPACT_RADIUS) {
+        } else if (distance > 150) {
             setImpactInProgress(false);
             impactCoefficient = 0;
         } else {
             setImpactInProgress(true);
-            double coefficient = 1-(distance- SMALL_IMPACT_RADIUS)/(LARGE_IMPACT_RADIUS - SMALL_IMPACT_RADIUS);
+            double coefficient = 1-(distance- 50)/(150 - 50);
             impactCoefficient = coefficient * 4;
         }
         return impactCoefficient;
@@ -164,6 +165,18 @@ public class EpsilonModel implements Movable, Collidable, Impactable {
 //        return this.vertices;
         return null;
     }
+
+//    @Override
+//    public ArrayList<Point2D> getVertices() {
+//
+////        return this.vertices;
+//        return vertices;
+//    }
+
+
+//    public static ArrayList<EpsilonModel> getEpsilonModels() {
+//        return epsilonModels;
+//    }
 
     @Override
     public void move(Direction direction) {
@@ -209,7 +222,6 @@ public class EpsilonModel implements Movable, Collidable, Impactable {
 
     public Point2D reflect(Point2D normalVector){
 
-//        Point2D r=
         double dotProduct = dotVectors(getDirection().getDirectionVector(), normalVector);
         Point2D reflection = addVectors(
                 getDirection().getDirectionVector(),
@@ -230,6 +242,13 @@ public class EpsilonModel implements Movable, Collidable, Impactable {
         }
     }
 
+    public void updateVertices(){
+        for (int i = 0; i < numberOfVertices; i++) {
+            double alpha = 2*PI*i/numberOfVertices+angle;
+            vertices.set(i, new Point2D.Double(getAnchor().getX()+RADIUS*Math.cos(alpha), getAnchor().getY()+RADIUS*Math.sin(alpha)));
+        }
+    }
+
     public void setHp(int hp) {
         this.hp = hp;
     }
@@ -241,7 +260,15 @@ public class EpsilonModel implements Movable, Collidable, Impactable {
     public int getHp() {
         return hp;
     }
+    public void damage(int damage){
+        this.hp -= damage;
+    }
 
+    public double getAngle() {
+        return angle;
+    }
 
-
+    public void setAngle(double angle) {
+        this.angle = angle;
+    }
 }

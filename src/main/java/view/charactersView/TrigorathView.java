@@ -44,7 +44,16 @@ public class TrigorathView implements Drawable{
         int[] yPoly = new int[]{(int) vertices[0].getY(), (int) vertices[1].getY(), (int) vertices[2].getY()};
         g.setColor(Color.white);
         Polygon poly = new Polygon(xPoly, yPoly, xPoly.length);
-        g.fillPolygon(poly);
+        g.setColor(Color.yellow);
+//        g.setClip(1,2,3,4);
+        g.setPaintMode();
+        g.drawPolygon(poly);
+
+//        g.setColor(Color.yellow);
+//        g.fillOval((int)vertices[0].getX()-2, (int)vertices[0].getY()-2, 4, 4);
+//        g.fillOval((int)vertices[1].getX()-2, (int)vertices[1].getY()-2, 4, 4);
+//        g.fillOval((int)vertices[2].getX()-2, (int)vertices[2].getY()-2, 4, 4);
+
     }
 
     public void setVertices(Point2D[] vertices) {
