@@ -18,6 +18,7 @@ import static controller.Constants.*;
 import static controller.Controller.*;
 import static controller.Sound.playBubble;
 import static controller.Sound.playDeathSound;
+import static controller.Update.aliveEnemies;
 import static controller.Utils.*;
 
 public class TrigorathModel implements Movable, Collidable, Impactable {
@@ -157,7 +158,7 @@ public class TrigorathModel implements Movable, Collidable, Impactable {
                 setImpactInProgress(true);
                 impactMaxVelocity = 2 * IMPACT_COEFFICIENT / 5;
                 impactCoefficient = IMPACT_COEFFICIENT;
-            } else if (distance > (LARGE_IMPACT_RADIUS + SMALL_IMPACT_RADIUS - 50) /2) {
+            } else if (distance > (LARGE_IMPACT_RADIUS + SMALL_IMPACT_RADIUS ) /2) {
                 setImpactInProgress(false);
                 impactCoefficient = 0;
             } else {
@@ -172,7 +173,7 @@ public class TrigorathModel implements Movable, Collidable, Impactable {
                 setImpactInProgress(true);
                 impactMaxVelocity = 2 * IMPACT_COEFFICIENT / 5;
                 impactCoefficient = IMPACT_COEFFICIENT;
-            } else if (distance > (LARGE_IMPACT_RADIUS + SMALL_IMPACT_RADIUS - 50) /2) {
+            } else if (distance > (LARGE_IMPACT_RADIUS + SMALL_IMPACT_RADIUS ) /2) {
                 setImpactInProgress(false);
                 impactCoefficient = 0;
             } else {
@@ -195,16 +196,16 @@ public class TrigorathModel implements Movable, Collidable, Impactable {
         double impactCoefficient;
         if (distance < 100) {
             setImpactInProgress(true);
-            impactMaxVelocity = 2.5 * IMPACT_COEFFICIENT / 5;
+            impactMaxVelocity = 3 * IMPACT_COEFFICIENT / 5;
             impactCoefficient = IMPACT_COEFFICIENT;
-        } else if (distance > 225) {
+        } else if (distance > 400) {
             setImpactInProgress(false);
             impactCoefficient = 0;
         } else {
             setImpactInProgress(true);
             double coefficient = 1 - (distance- 100)/(500 - 100);
             impactCoefficient = coefficient * IMPACT_COEFFICIENT;
-            impactMaxVelocity = 2.5 * coefficient * impactCoefficient / 5;
+            impactMaxVelocity = 3* coefficient * impactCoefficient / 5;
         }
 //         impactCoefficient = getImpactCoefficient(collisionRelativeVector);
 //        impactCoefficient *= 2;
@@ -306,22 +307,6 @@ public class TrigorathModel implements Movable, Collidable, Impactable {
         }
 
 
-
-//        if (distanceByEpsilon > 200 ) {
-//            if (direction.getMagnitude() < 1.5) {
-//                setDirection(
-//                        new Direction(relativeLocation(EpsilonModel.getINSTANCE().getAnchor(), getAnchor())));
-////                getDirection().adjustDirectionMagnitude();
-//            }
-//        } else {
-//            if (direction.getMagnitude() < 1) {
-//                setDirection(
-//                        new Direction(relativeLocation(EpsilonModel.getINSTANCE().getAnchor(), getAnchor())));
-//                getDirection().adjustDirectionMagnitude();
-//            }
-//        }
-
-
     }
 
     public double getAngle() {
@@ -379,6 +364,7 @@ public class TrigorathModel implements Movable, Collidable, Impactable {
         collidables.remove(this);
         movables.remove(this);
         trigorathModels.remove(this);
+        aliveEnemies--;
         findTrigorathView(id).remove();
         dropCollectible();
         playDeathSound();
@@ -390,13 +376,11 @@ public class TrigorathModel implements Movable, Collidable, Impactable {
         double theta = random.nextGaussian(Math.PI, 1);
         if (theta<PI/2) theta = PI/2;
         if (theta>3*PI/2) theta = 3*PI/2;
-        System.out.println(theta);
         new CollectibleModel(getAnchor(), rotateVector(direction, theta));
 
         theta = random.nextGaussian(Math.PI, 1);
         if (theta<PI/2) theta = PI/2;
         if (theta>3*PI/2) theta = 3*PI/2;
-        System.out.println(theta);
         new CollectibleModel(getAnchor(), rotateVector(direction, theta));
 
 

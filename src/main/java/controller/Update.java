@@ -14,25 +14,21 @@ import view.charactersView.TrigorathView;
 import view.charactersView.EpsilonView;
 
 import javax.swing.*;
+import javax.swing.Timer;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import static controller.Constants.RADIUS;
+import static controller.Constants.*;
 import static controller.Controller.*;
-//import static controller.KeyController.deltaX;
-//import static controller.KeyController.deltaY;
 import static controller.Game.*;
-//import static controller.Game.ShopAbility.*;
 import static controller.Game.SkillTreeAbility.*;
 import static controller.MouseController.*;
-import static controller.Sound.playVictorySound;
+import static controller.Sound.*;
 import static controller.Utils.*;
 import static model.CollectibleModel.collectibleModels;
 import static model.charactersModel.SquarantineModel.squarantineModels;
@@ -40,9 +36,9 @@ import static model.charactersModel.TrigorathModel.trigorathModels;
 import static model.collision.Collidable.collidables;
 import static model.collision.Impactable.impactables;
 import static model.movement.Movable.movables;
+import static org.example.Main.sensitivity;
 import static view.BulletView.bulletViews;
 import static view.CollectibleView.collectibleViews;
-//import static view.ShopPanel.heal;
 import static view.charactersView.SquarantineView.squarantineViews;
 import static view.charactersView.TrigorathView.trigorathViews;
 
@@ -68,20 +64,28 @@ public class Update implements KeyListener {
     private double skillAbilityActivateTime=-1;
     private double hpRegainRate = Double.MAX_VALUE;
     public static ShopAbility shopAbility=null;
-
-
+    private double lastCreatedEnemyTime=-1;
+    public static double lastShot = 0;
+    public static boolean decreaseVelocities;
+    public static double decrementRation;
+    private static boolean firstLoop;
+    private static int createdNumberOfEnemies;
+    public static int aliveEnemies;
 
 
 
     public Update() {
-
-//        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-//        Runnable task = () -> {
-//            updateModel();
-//        };
-//        long initialDelay = 0;
-//        long period = 16; // milliseconds
-//        executor.scheduleAtFixedRate(task, initialDelay, period, TimeUnit.MILLISECONDS);
+        decreaseVelocities=false;
+        decrementRation=1;
+        lastShot = 0;
+        shopAbility=null;
+        epsilonMeleeDamage=10;
+        epsilonRangedDamage=5;
+        movementInProgress = false;
+        firstLoop= true;
+        createdNumberOfEnemies=0;
+        aliveEnemies=0;
+        playThemeSound();
 
 
         MainFrame.getINSTANCE().addKeyListener(this);
@@ -123,6 +127,14 @@ public class Update implements KeyListener {
         double deltaY=0;
 
         Map<String, Integer> keyBindings = KeyBindingMenu.getINSTANCE().getKeyBindings();
+        double ratio=1;
+
+        if (sensitivity<50) EPSILON_MAX_SPEED=3;
+        if (50<=sensitivity && sensitivity<60) EPSILON_MAX_SPEED=3.5;
+        if (60<sensitivity && sensitivity<70) EPSILON_MAX_SPEED=4;
+        if (70<sensitivity && sensitivity<80) EPSILON_MAX_SPEED=4.5;
+        if (80<sensitivity && sensitivity<90) EPSILON_MAX_SPEED=5;
+        if (90<sensitivity && sensitivity<=100) EPSILON_MAX_SPEED=5.5;
 
 
 
@@ -158,23 +170,21 @@ public class Update implements KeyListener {
 
         long currentTickTime = System.currentTimeMillis();
         long interval = currentTickTime - lastTickTime;
-        double wait = 0;
-        if (interval < 15.38461538) {
-            wait = 15.38461538 - interval;
-            interval = (long) 15.38461538;
+//        System.out.println(interval);
+//        double wait = 0;
+        if (interval < 15) {
+//            wait = 15.38461538 - interval;
+//            interval = (long) 15.38461538;
+            decreaseVelocities=true;
+//            System.out.println(decrementRation);
         }
-        try {
-            Thread.sleep((long) wait);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        else {
+            decreaseVelocities=false;
         }
+
 
 
         lastTickTime = currentTickTime;
-
-
-
-
 
         elapsedTime += (double) interval / 1000;
 
@@ -225,6 +235,21 @@ public class Update implements KeyListener {
     public void updateModel(){
 
 
+        if (createdNumberOfEnemies<5*wave+5 && wave<4) creatEnemy();
+        if (createdNumberOfEnemies==5*wave+5 && aliveEnemies==0 && wave<4){
+            createdNumberOfEnemies=0;
+            wave++;
+        }
+
+
+
+        for (int i = 0; i < collectibleModels.size(); i++) {
+            double age = elapsedTime-collectibleModels.get(i).birthTime;
+            if (age>=10) collectibleModels.get(i).remove();
+
+        }
+
+
         if (EpsilonModel.getINSTANCE().getHp() <= 0){
             MainFrame.getINSTANCE().remove(MainPanel.getINSTANCE());
             MainFrame.getINSTANCE().repaint();
@@ -235,35 +260,46 @@ public class Update implements KeyListener {
         }
 
         if (wave>3){
-
+            MainFrame.getINSTANCE().removeKeyListener(this);
+            MainFrame.getINSTANCE().removeMouseListener(MainPanel.getINSTANCE().getMouseController());
+            if (theme.isRunning()) stopThemeSound();
             playVictorySound();
             RADIUS += 1;
         }
 
+        if (RADIUS>500){
+            MainFrame.getINSTANCE().remove(MainPanel.getINSTANCE());
+            MainFrame.getINSTANCE().repaint();
+            MainFrame.getINSTANCE().remove(MainFrame.label);
+            gameLoop.stop();
+            new VictoryPanel();
 
+        }
 
-        // Increment frame count every time updateView is called
         updateCount++;
 
-        for (SquarantineModel squarantineModel: squarantineModels){
-            if (squarantineModel.isImpactInProgress()){
-                squarantineModel.getDirection().accelerateDirection(squarantineModel.impactMaxVelocity);
-                if (squarantineModel.getDirection().getMagnitude() > squarantineModel.impactMaxVelocity){
-                    squarantineModel.setImpactInProgress(false);
+        for (int i = 0; i < squarantineModels.size(); i++) {
+            if (squarantineModels.get(i).isImpactInProgress()){
+                squarantineModels.get(i).getDirection().accelerateDirection(squarantineModels.get(i).impactMaxVelocity);
+                if (squarantineModels.get(i).getDirection().getMagnitude() > squarantineModels.get(i).impactMaxVelocity){
+                    squarantineModels.get(i).setImpactInProgress(false);
                 }
             }
+            if (squarantineModels.get(i).getHp() <= 0) squarantineModels.get(i).remove();
+
         }
-        for (TrigorathModel trigorathModel: trigorathModels){
 
-            if (trigorathModel.isImpactInProgress()){
-                trigorathModel.getDirection().accelerateDirection(trigorathModel.impactMaxVelocity);
-                    if (trigorathModel.getDirection().getMagnitude() > trigorathModel.impactMaxVelocity) {
-
-                        trigorathModel.setImpactInProgress(false);
-                    }
-//                }
+        for (int i = 0; i < trigorathModels.size(); i++) {
+            if (trigorathModels.get(i).isImpactInProgress()){
+                trigorathModels.get(i).getDirection().accelerateDirection(trigorathModels.get(i).impactMaxVelocity);
+                if (trigorathModels.get(i).getDirection().getMagnitude() > trigorathModels.get(i).impactMaxVelocity) {
+                    trigorathModels.get(i).setImpactInProgress(false);
+                }
             }
+            if (trigorathModels.get(i).getHp() <= 0 ) trigorathModels.get(i).remove();
+
         }
+
         EpsilonModel epsilonModel = EpsilonModel.getINSTANCE();
         if (epsilonModel.isImpactInProgress()){
             epsilonModel.getDirection().accelerateDirection(6);
@@ -347,6 +383,16 @@ public class Update implements KeyListener {
             }
         }
 
+
+        MainPanel panel =MainPanel.getINSTANCE();
+        if (elapsedTime < 2) panel.verticalShrink(2);
+        if (elapsedTime < 2) panel.horizontalShrink(2);
+        if (elapsedTime > 2 && elapsedTime < 10) {
+            panel.expansion();
+        }
+        if (elapsedTime > 10) panel.panelMotion();
+
+
     }
 
 
@@ -361,13 +407,10 @@ public class Update implements KeyListener {
         if (e.getKeyCode() == keyBindings.get("Open Shop")){
 
             if (gameLoop.isRunning()) {
-                //   TODO shop ...
                 shopPanel = new ShopPanel();
                 MainFrame.getINSTANCE().removeMouseListener(MainPanel.getINSTANCE().getMouseController());
-
                 MainFrame.getINSTANCE().repaint();
                 MainFrame.getINSTANCE().addMouseListener(shopPanel);
-//                MainFrame.getINSTANCE().addKeyListener(this);
                 gameLoop.stop();
             }
             else {
@@ -378,9 +421,6 @@ public class Update implements KeyListener {
             }
 
         }
-        // todo add key change to abilities
-
-//        Map<String, Integer> keyBindings = KeyBindingMenu.getINSTANCE().getKeyBindings();
 
         if (gameLoop.isRunning()) {
             if (e.getKeyCode() == keyBindings.get("Activate Skill Tree Ability")){
@@ -402,17 +442,6 @@ public class Update implements KeyListener {
                 }
 
             }
-        }
-        if (e.getKeyCode() == KeyEvent.VK_F){
-            Game.SkillTreeAbility ability = Game.skillTreeAbility;
-            if (ability == ares) {
-                System.out.println("aceso");
-            } else if (ability == aceso){
-                System.out.println("aceso");
-            } else if (ability == proteus){
-                System.out.println("proteus");
-            }
-
         }
         keysPressed.add(e.getKeyCode());
         if (!movementInProgress) {
@@ -497,21 +526,82 @@ public class Update implements KeyListener {
     }
 
     public void empower(){
-            System.out.println("empower");
             empowerStartTime = elapsedTime;
             empowerEndTime = elapsedTime + 10;
             empowerIsOn = true;
+//            TODO move null maker
             shopAbility = null;
     }
     public void banish(){
-        // TODO add XP handler -100
-        if (Game.getINSTANCE().getInGameXp() >= 0){
-            for (Impactable impactable : impactables) {
-                impactable.banish();
-            }
-//            Game.getINSTANCE().sumXpWith(-100);
+        for (Impactable impactable : impactables) {
+            impactable.banish();
         }
         shopAbility = null;
+
+    }
+
+    private void creatEnemy(){
+        double interval = elapsedTime - lastCreatedEnemyTime;
+        if ((lastCreatedEnemyTime != -1 && interval < INTERVAL) || elapsedTime < 8) return;
+        lastCreatedEnemyTime = elapsedTime;
+        createdNumberOfEnemies++;
+        aliveEnemies++;
+        MainPanel panel = MainPanel.getINSTANCE();
+        MainFrame frame = MainFrame.getINSTANCE();
+        Point2D vertex1 = panel.getVertices()[0];
+        Point2D vertex2 = panel.getVertices()[1];
+        Point2D vertex3 = panel.getVertices()[2];
+        Point2D vertex4 = panel.getVertices()[3];
+        ArrayList<Integer> accessibles = new ArrayList<>();
+        boolean leftAccessible = (vertex1.getX()>50) && (vertex4.getX()>50);
+        boolean upAccessible = (vertex1.getY()>50) && (vertex2.getY()>50);
+        boolean rightAccessible = (frame.getWidth()-vertex2.getX()>50) && (frame.getWidth()-vertex3.getX()>50);
+        boolean downAccessible = (frame.getHeight()-vertex3.getY()>50) && (frame.getHeight()-vertex4.getY()>50);
+        if (leftAccessible) accessibles.add(0);
+        if (upAccessible) accessibles.add(1);
+        if (rightAccessible) accessibles.add(2);
+        if (downAccessible) accessibles.add(3);
+
+        Random random = new Random();
+        int index = random.nextInt(accessibles.size());
+        if (accessibles.get(index) == 0){
+            double y = random.nextDouble(vertex1.getY(), vertex4.getY());
+            int rand = random.nextInt(2);
+            Point2D anchor = new Point2D.Double(vertex1.getX()-40, y);
+            if (rand==0) new SquarantineModel(anchor);
+            if (rand==1) new TrigorathModel(anchor);
+
+        }
+        if (accessibles.get(index) == 1){
+            double x = random.nextDouble(vertex1.getX(), vertex2.getX());
+            int rand = random.nextInt(2);
+            Point2D anchor = new Point2D.Double(x, vertex2.getY()-40);
+            if (rand==0) new SquarantineModel(anchor);
+            if (rand==1) new TrigorathModel(anchor);
+
+
+
+        }
+        if (accessibles.get(index) == 2){
+            double y = random.nextDouble(vertex2.getY(), vertex3.getY());
+            int rand = random.nextInt(2);
+            Point2D anchor = new Point2D.Double(vertex3.getX()+40, y);
+            if (rand==0) new SquarantineModel(anchor);
+            if (rand==1) new TrigorathModel(anchor);
+
+
+
+        }
+        if (accessibles.get(index) == 3){
+            double x = random.nextDouble(vertex4.getX(), vertex3.getX());
+            int rand = random.nextInt(2);
+            Point2D anchor = new Point2D.Double(x, vertex4.getY()+40);
+            if (rand==0) new SquarantineModel(anchor);
+            if (rand==1) new TrigorathModel(anchor);
+
+        }
+
+
     }
 
 

@@ -2,6 +2,7 @@ package controller;
 
 import model.charactersModel.EpsilonModel;
 import model.charactersModel.SquarantineModel;
+import model.charactersModel.TrigorathModel;
 import view.MainPanel;
 import view.MainFrame;
 
@@ -15,13 +16,10 @@ import static view.MainFrame.label;
 
 
 public class Game {
-
-
-
     private static Game INSTANCE;
-    public static int inGameXP =100;
+    public static int inGameXP;
     public static double elapsedTime=0;
-    public static int wave= 1;
+    public static int wave;
     private boolean isPaused = false;
     private EpsilonModel epsilon;
     public static SkillTreeAbility skillTreeAbility=null;
@@ -29,36 +27,24 @@ public class Game {
     public static double empowerEndTime = Double.MAX_VALUE;
     public static double empowerStartTime = Double.MAX_VALUE;
     public static Clip clip;
-
-
-
     public static BufferedImage bufferedImage;
     public static Image bufferedImageResult;
     public static SkillTreeAbility activeAbility;
+    private static Update update;
 
 
 
 
     public Game (){
         INSTANCE = this;
-
+        elapsedTime=0;
+        inGameXP=0;
+        wave=1;
+        Constants.RADIUS = 15;
         SwingUtilities.invokeLater(() -> {
             MainFrame.getINSTANCE().add(label);
-            epsilon = new EpsilonModel(new Point2D.Double((double) MainFrame.getINSTANCE().getWidth() /2,(double) MainFrame.getINSTANCE().getHeight() /2));
-//            new SquarantineModel(new Point2D.Double(500,500));
-//            new SquarantineModel(new Point2D.Double(200,700));
-//            new SquarantineModel(new Point2D.Double(500,300));
-//            new SquarantineModel(new Point2D.Double(900,900));
-//            new SquarantineModel(new Point2D.Double(800,900));
-//
-//            new TrigorathModel(new Point2D.Double(600,700));
-//            new TrigorathModel(new Point2D.Double(700,1000));
-//            new TrigorathModel(new Point2D.Double(300,500));
-//            new TrigorathModel(new Point2D.Double(700,200));
-//            new TrigorathModel(new Point2D.Double(900,900));
-//            new TrigorathModel(new Point2D.Double(1000,1000));
             MainPanel.getINSTANCE();
-            new Update();
+            update = new Update();
 
         });
     }
@@ -93,5 +79,7 @@ public class Game {
 
     public static void nullifyGameInstance() {
         INSTANCE = null;
+        MainFrame.getINSTANCE().removeKeyListener(update);
+        update=null;
     }
 }

@@ -11,15 +11,17 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import static controller.Constants.*;
+
 public class SettingsMenu extends JPanel implements MouseListener, MouseMotionListener, ChangeListener {
     JLabel backLabel = new JLabel("back");
     Point backButton = new Point(22, 22);
 
     JLabel difficultyLabel = new JLabel("Difficulty:", SwingConstants.CENTER);
-    JSlider difficultySlider = new JSlider(0, 100, 50); // Assuming range 0-100
+    JSlider difficultySlider = new JSlider(0, 100, 100); // Assuming range 0-100
 
     JLabel volumeLabel = new JLabel("Sound Volume:", SwingConstants.CENTER);
-    JSlider volumeSlider = new JSlider(0, 100, 50);
+    JSlider volumeSlider = new JSlider(0, 100, 100);
 
     JLabel sensitivityLabel = new JLabel("Movement Sensitivity:", SwingConstants.CENTER);
     JSlider sensitivitySlider = new JSlider(0, 100, 50);
@@ -132,9 +134,26 @@ public class SettingsMenu extends JPanel implements MouseListener, MouseMotionLi
     @Override
     public void stateChanged(ChangeEvent e) {
         double difficultyNumber = difficultySlider.getValue();
-        if (difficultyNumber < 33.33) Main.difficulty = Main.Difficulty.easy;
-        if (33.33 < difficultyNumber && difficultyNumber < 66.67) Main.difficulty = Main.Difficulty.normal;
-        if (66.67 < difficultyNumber) Main.difficulty = Main.Difficulty.hard;
+        if (difficultyNumber < 33.33) {
+            Main.difficulty = Main.Difficulty.easy;
+            INTERVAL=8;
+            SQUARANTINE_RADIUS = 30;
+            TRIGORATH_RADIUS = 30;
+        }
+        if (33.33 < difficultyNumber && difficultyNumber < 66.67) {
+            Main.difficulty = Main.Difficulty.normal;
+            INTERVAL=6;
+            SQUARANTINE_RADIUS = 25;
+            TRIGORATH_RADIUS = 25;
+
+        }
+        if (66.67 < difficultyNumber) {
+            Main.difficulty = Main.Difficulty.hard;
+            INTERVAL=5;
+            SQUARANTINE_RADIUS = 20;
+            TRIGORATH_RADIUS = 20;
+
+        }
 
         Main.soundVolume = volumeSlider.getValue();
 

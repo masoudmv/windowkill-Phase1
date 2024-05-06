@@ -4,6 +4,8 @@ import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
 public class Constants {
+
+    // Constants may not be constant indeed! :)
     public static final Dimension FRAME_DIMENSION = Toolkit.getDefaultToolkit().getScreenSize();
     public static final Dimension PANEL_SIZE = new Dimension((int) (FRAME_DIMENSION.getWidth()/2), (int) (FRAME_DIMENSION.getWidth()/2));
 //    public static final Dimension PANEL_SIZE = new Dimension((int) 600, (int) 600);
@@ -12,13 +14,12 @@ public class Constants {
     public static final double FRAME_UPDATE_TIME=(double) TimeUnit.SECONDS.toMillis(1)/FPS;
     public static final int UPS = 100;
     public static final double MODEL_UPDATE_TIME=(double) TimeUnit.SECONDS.toMillis(1)/UPS;
-    public static final double EPSILON_MAX_SPEED = 3.5;
+    public static double EPSILON_MAX_SPEED = 3.5;
     public static final double SPEED = 1;
     public static double RADIUS = 15;
-    public static final double SQUARANTINE_EDGE = 40;
-    public static final double SQUARANTINE_RADIUS = SQUARANTINE_EDGE/Math.sqrt(2);
-    public static final double TRIGORATH_RADIUS = 25;
-    public static final double TRIGORATH_EDGE = 50;
+    public static double SQUARANTINE_RADIUS = 20;
+    public static double TRIGORATH_RADIUS = 20;
+    public static double SQUARANTINE_EDGE = SQUARANTINE_RADIUS * Math.sqrt(2);
     public static final double FRICTION = 0.97;
     public static final double IMPACT_COEFFICIENT = 6;
     public static final double BULLET_IMPACT_COEFFICIENT = 5;
@@ -28,4 +29,6 @@ public class Constants {
     public static final double BULLET_RADIUS = 5;
     public static final double BULLET_VELOCITY = 10;
     public static final double TRIGORATH_MAX_VEL_RADIUS = 200;
+    public static double INTERVAL = 5;
+
 }

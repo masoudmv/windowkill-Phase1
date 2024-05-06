@@ -33,7 +33,7 @@ public class Main {
     public static double sensitivity = 50;
     public static Graphics2D g2d;
     public static Difficulty difficulty = Difficulty.normal;
-    public static int totalXP=20000;
+    public static int totalXP=0;
 
     public static boolean aresIsActivated = false;
     public static boolean acesoIsActivated = false;
@@ -54,8 +54,8 @@ public class Main {
 
         new Sound();
 //        new GameOverPanel();
-        new Game();
-//        new Menu();
+//        new Game();
+        new Menu();
 //
 //        new SkillTreeMenu();
 //

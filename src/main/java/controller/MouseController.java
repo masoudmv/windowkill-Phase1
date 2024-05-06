@@ -23,6 +23,7 @@ import java.util.Timer;
 import static controller.Constants.BULLET_VELOCITY;
 import static controller.Constants.PI;
 import static controller.Game.*;
+import static controller.Update.lastShot;
 import static controller.Utils.findAngleBetweenTwoVectors;
 import static controller.Utils.relativeLocation;
 //import static controller.Sound.sound;
@@ -31,15 +32,15 @@ import static controller.Utils.relativeLocation;
 
 public class MouseController implements MouseListener,MouseMotionListener {
     private EpsilonModel epsilon;
-    public static double lastShot = 0;
     public static Point2D mousePosition = null;
     public static boolean tripleShot=false;
     public static BulletModel lastBullet=null;
 
     public MouseController(){
         this.epsilon = EpsilonModel.getINSTANCE();
-        MainFrame.getINSTANCE().addMouseMotionListener(this);
-
+        mousePosition = null;
+        tripleShot=false;
+        lastBullet=null;
     }
 
     @Override
@@ -62,6 +63,7 @@ public class MouseController implements MouseListener,MouseMotionListener {
             lastBullet = new BulletModel(epsilon.getAnchor(), new Direction(direction));
             lastShot=elapsedTime;
             if (elapsedTime < empowerEndTime) tripleShot=true;
+
         }
 
 
@@ -111,5 +113,6 @@ public class MouseController implements MouseListener,MouseMotionListener {
         epsilon.setAngle(alpha);
         epsilon.updateVertices();
     }
+
 }
 

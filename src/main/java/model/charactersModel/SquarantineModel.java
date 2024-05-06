@@ -17,6 +17,7 @@ import static controller.Constants.*;
 import static controller.Controller.*;
 import static controller.Sound.playBubble;
 import static controller.Sound.playDeathSound;
+import static controller.Update.aliveEnemies;
 import static controller.Utils.*;
 
 public class SquarantineModel implements Movable, Collidable, Impactable {
@@ -141,12 +142,12 @@ public class SquarantineModel implements Movable, Collidable, Impactable {
             setImpactInProgress(true);
             impactMaxVelocity = 2 * IMPACT_COEFFICIENT / 5;
             impactCoefficient = IMPACT_COEFFICIENT;
-        } else if (distance > (LARGE_IMPACT_RADIUS + SMALL_IMPACT_RADIUS - 50) /2) {
+        } else if (distance > (LARGE_IMPACT_RADIUS + SMALL_IMPACT_RADIUS ) /2) {
             setImpactInProgress(false);
             impactCoefficient = 0;
         } else {
             setImpactInProgress(true);
-            double coefficient = 1 - (distance- SMALL_IMPACT_RADIUS-50)/(LARGE_IMPACT_RADIUS - SMALL_IMPACT_RADIUS);
+            double coefficient = 1 - (distance- SMALL_IMPACT_RADIUS)/(LARGE_IMPACT_RADIUS - SMALL_IMPACT_RADIUS);
             impactCoefficient = coefficient * IMPACT_COEFFICIENT;
             impactMaxVelocity = 2 * coefficient * IMPACT_COEFFICIENT / 5;
         }
@@ -297,6 +298,7 @@ public class SquarantineModel implements Movable, Collidable, Impactable {
         collidables.remove(this);
         movables.remove(this);
         squarantineModels.remove(this);
+        aliveEnemies--;
         findSquarantineView(id).remove();
         dropCollectible();
         playDeathSound();
@@ -318,16 +320,11 @@ public class SquarantineModel implements Movable, Collidable, Impactable {
 
 
     public void dropCollectible() {
-//        remove();
         Point2D direction = relativeLocation(getAnchor(), EpsilonModel.getINSTANCE().getAnchor());
         Random random = new Random();
         double theta = random.nextGaussian(Math.PI, 1);
-//        System.out.println(theta);
         if (theta<PI/2) theta = PI/2;
         if (theta>3*PI/2) theta = 3*PI/2;
-
-        System.out.println(theta);
         new CollectibleModel(getAnchor(), rotateVector(direction, theta));
-//        new CollectibleModel(getAnchor(), direction);
     }
 }

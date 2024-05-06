@@ -104,7 +104,7 @@ public class Menu extends JPanel implements MouseListener {
             } catch (AWTException ex) {
                 throw new RuntimeException(ex);
             }
-            r.setAutoDelay(20);
+            r.setAutoDelay(25);
             r.keyPress(KeyEvent.VK_WINDOWS);
             r.keyPress(KeyEvent.VK_D);
             r.keyRelease(KeyEvent.VK_D);

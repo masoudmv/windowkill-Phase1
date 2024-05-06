@@ -20,7 +20,7 @@ import static controller.Utils.normalizeVector;
 
 public class EpsilonModel implements Movable, Collidable, Impactable {
     private static EpsilonModel INSTANCE;
-    private int hp = 10;
+    private int hp = 100;
     Point2D anchor;
     double radius;
     private boolean impactInProgress = false;
@@ -39,7 +39,6 @@ public class EpsilonModel implements Movable, Collidable, Impactable {
         this.radius = RADIUS;
 
         this.id= UUID.randomUUID().toString();
-//        null direction???
         Point vector = new Point(0,0);
         this.direction=new Direction(vector);
         epsilonModels.add(this);
@@ -76,30 +75,7 @@ public class EpsilonModel implements Movable, Collidable, Impactable {
     }
 
     @Override
-    public void bulletImpact(BulletModel bulletModel, Point2D collisionPoint){
-//        Point2D dist = relativeLocation(getAnchor(), collisionPoint);aaaaw;
-
-    }
-
-
-    //    @Override
-//    public double getImpactCoefficient(double distance) {
-////        double distance = Math.hypot(collisionRelativeVector.getX(), collisionRelativeVector.getY());
-//        double impactCoefficient;
-//        if (distance < SMALL_IMPACT_RADIUS) {
-//            setImpactInProgress(true);
-//            impactCoefficient = IMPACT_COEFFICIENT;
-//        } else if (distance > LARGE_IMPACT_RADIUS) {
-//            setImpactInProgress(false);
-//            impactCoefficient = 0;
-//        } else {
-//            setImpactInProgress(true);
-//            double coefficient = 1-(distance- SMALL_IMPACT_RADIUS)/(LARGE_IMPACT_RADIUS - SMALL_IMPACT_RADIUS);
-//            impactCoefficient = coefficient * IMPACT_COEFFICIENT;
-//        }
-//        return impactCoefficient;
-//    }
-
+    public void bulletImpact(BulletModel bulletModel, Point2D collisionPoint){}
     @Override
     public Direction getDirection() {
         return direction;
@@ -161,23 +137,8 @@ public class EpsilonModel implements Movable, Collidable, Impactable {
 
     @Override
     public Point2D[] getVertices() {
-
-//        return this.vertices;
         return null;
     }
-
-//    @Override
-//    public ArrayList<Point2D> getVertices() {
-//
-////        return this.vertices;
-//        return vertices;
-//    }
-
-
-//    public static ArrayList<EpsilonModel> getEpsilonModels() {
-//        return epsilonModels;
-//    }
-
     @Override
     public void move(Direction direction) {
         Point2D movement = multiplyVector(direction.getNormalizedDirectionVector(), direction.getMagnitude());
@@ -205,6 +166,8 @@ public class EpsilonModel implements Movable, Collidable, Impactable {
 
     @Override
     public void friction(){
+
+
         if (isImpactInProgress()){
 //            direction.setMagnitude(direction.getMagnitude() * FRICTION);
             if (direction.getMagnitude() < 1){
@@ -270,5 +233,8 @@ public class EpsilonModel implements Movable, Collidable, Impactable {
 
     public void setAngle(double angle) {
         this.angle = angle;
+    }
+    public static void nullifyEpsilon(){
+        INSTANCE = null;
     }
 }

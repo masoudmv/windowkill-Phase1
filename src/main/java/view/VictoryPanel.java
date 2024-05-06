@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import static controller.Game.*;
+import static controller.Sound.stopVictorySound;
 import static java.awt.Color.*;
 import static model.BulletModel.bulletModels;
 import static model.CollectibleModel.collectibleModels;
@@ -25,10 +26,10 @@ import static view.charactersView.Drawable.drawables;
 import static view.charactersView.SquarantineView.squarantineViews;
 import static view.charactersView.TrigorathView.trigorathViews;
 
-public class GameOverPanel extends JPanel implements MouseListener {
-    private static GameOverPanel INSTANCE;
+public class VictoryPanel extends JPanel implements MouseListener {
+    private static VictoryPanel INSTANCE;
 
-    public GameOverPanel() {
+    public VictoryPanel() {
         INSTANCE = this;
         MainFrame frame = MainFrame.getINSTANCE();
         Dimension dimension = new Dimension(600, 600);
@@ -39,7 +40,7 @@ public class GameOverPanel extends JPanel implements MouseListener {
 
         // Adding labels
 
-        JLabel gameOver = new JLabel("Game Over");
+        JLabel gameOver = new JLabel("Victory!");
         gameOver.setBounds( 150,100, 300, 100);
         gameOver.setForeground(red);
         gameOver.setLayout(new GridBagLayout());
@@ -100,6 +101,7 @@ public class GameOverPanel extends JPanel implements MouseListener {
         totalXP += inGameXP;
         nullifyEpsilon();
         nullifyGameInstance();
+        stopVictorySound();
 
 
         MainFrame.getINSTANCE().removeMouseListener(MainPanel.getINSTANCE().getMouseController());
@@ -120,8 +122,8 @@ public class GameOverPanel extends JPanel implements MouseListener {
 
     @Override
     public void mouseExited(MouseEvent e) {}
-    public static GameOverPanel getINSTANCE(){
-        if (INSTANCE == null) INSTANCE = new GameOverPanel();
+    public static VictoryPanel getINSTANCE(){
+        if (INSTANCE == null) INSTANCE = new VictoryPanel();
         return INSTANCE;
     }
 

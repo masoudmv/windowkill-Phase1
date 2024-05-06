@@ -46,11 +46,12 @@ public final class MainPanel extends JPanel implements Collidable, Impactable, M
     public boolean moveUp = false;
     private double velocity = 0;
     private double acceleration = 0;
-    private MouseController mouseController = new MouseController();
+    private final MouseController mouseController;
 
 
     private MainPanel() {
         INSTANCE = this;
+        mouseController = new MouseController();
         MainFrame frame = MainFrame.getINSTANCE();
         setSize(panelSize);
         setLocationToCenter(frame);
@@ -62,6 +63,7 @@ public final class MainPanel extends JPanel implements Collidable, Impactable, M
         vertices = new Point2D[]{vertex1, vertex2, vertex3, vertex4};
 
         frame.addMouseListener(mouseController);
+        frame.addMouseMotionListener(mouseController);
         Collidable.collidables.add(this);
         frame.add(this);
     }
@@ -83,12 +85,6 @@ public final class MainPanel extends JPanel implements Collidable, Impactable, M
         for(Drawable obj: drawables){
             obj.draw(g);
         }
-
-
-
-
-
-
     }
 
     public static MainPanel getINSTANCE() {
@@ -208,6 +204,8 @@ public final class MainPanel extends JPanel implements Collidable, Impactable, M
             adjustLocation();
             panelSize = new Dimension((int) width, (int) height);
             setSize(panelSize);
+            MainFrame.getINSTANCE().repaint();
+            MainPanel.getINSTANCE().repaint();
         } if (velocity<0)moveRight = false;
     }
 
@@ -222,6 +220,10 @@ public final class MainPanel extends JPanel implements Collidable, Impactable, M
             adjustLocation();
             panelSize = new Dimension((int) width, (int) height);
             setSize(panelSize);
+            MainFrame.getINSTANCE().repaint();
+            MainPanel.getINSTANCE().repaint();
+
+
         } if (velocity<0) moveDown = false;
     }
 
@@ -236,6 +238,9 @@ public final class MainPanel extends JPanel implements Collidable, Impactable, M
             adjustLocation();
             panelSize = new Dimension((int) width, (int) height);
             setSize(panelSize);
+            MainFrame.getINSTANCE().repaint();
+            MainPanel.getINSTANCE().repaint();
+
         } if (velocity<0) moveLeft = false;
     }
 
@@ -250,6 +255,9 @@ public final class MainPanel extends JPanel implements Collidable, Impactable, M
             adjustLocation();
             panelSize = new Dimension((int) width, (int) height);
             setSize(panelSize);
+            MainFrame.getINSTANCE().repaint();
+            MainPanel.getINSTANCE().repaint();
+
         }  if (velocity<0) moveUp = false;
     }
 
@@ -274,6 +282,19 @@ public final class MainPanel extends JPanel implements Collidable, Impactable, M
         if (!moveDown && !moveUp) {
             // don't change contraction coefficient!
             verticalShrink(0.25);
+        }
+    }
+
+    public void expansion(){
+        setVelocity(getAcceleration() + getVelocity());
+        if (getVelocity()<4) {
+            if (moveRight) moveRight();
+            if (moveDown) moveDown();
+            if (moveLeft) moveLeft();
+            if (moveUp) moveUp();
+        }
+        if (getVelocity() > 4){
+            setAcceleration(-0.45);
         }
     }
 

@@ -14,6 +14,7 @@ import java.util.List;
 
 //import static controller.SoundHandler.doPlay;
 //import static controller.SoundHandler.playSound;
+import static controller.Sound.playBubble;
 import static controller.Update.epsilonMeleeDamage;
 import static controller.Update.epsilonRangedDamage;
 import static controller.Utils.*;
@@ -39,6 +40,8 @@ public interface Collidable {
                     if (collidable instanceof  SquarantineModel) ((SquarantineModel)collidable).damage(epsilonRangedDamage);
                     if (collidable instanceof  TrigorathModel) ((TrigorathModel)collidable).damage(epsilonRangedDamage);
                     ((BulletModel) this).bulletImpact((BulletModel) this, intersection, collidable);
+                    
+
                 }
                 else if (!(collidable instanceof MainPanel) && !(this instanceof MainPanel)) {
 
@@ -72,6 +75,7 @@ public interface Collidable {
                         }
                     }
                 } else if (collidable instanceof MainPanel) {
+
                     ((Impactable) this).impact(relativeLocation(getAnchor(), intersection), intersection, collidable);
                 }
             }
@@ -94,9 +98,6 @@ public interface Collidable {
                 }
             }
         }
-
-
-
     }
 
 

@@ -13,6 +13,7 @@ import java.util.UUID;
 import static controller.Constants.BULLET_RADIUS;
 import static controller.Constants.IMPACT_COEFFICIENT;
 import static controller.Controller.*;
+import static controller.Game.elapsedTime;
 import static controller.Utils.*;
 import static controller.Utils.addVectors;
 
@@ -24,9 +25,11 @@ public class CollectibleModel implements Collidable, Movable {
     public Direction direction;
     public boolean impactInProgress;
     public double impactMaxVel;
+    public double birthTime;
 
 
     public CollectibleModel(Point2D anchor, Point2D direction) {
+        birthTime = elapsedTime;
         this.radius = BULLET_RADIUS;
         this.id= UUID.randomUUID().toString();
         this.anchor = anchor;
